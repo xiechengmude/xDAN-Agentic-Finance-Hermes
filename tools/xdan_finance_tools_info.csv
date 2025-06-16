@@ -1,0 +1,11 @@
+name,description,category,parameters,example_usage
+tushareMcp_get_stock_basic_info,获取股票基本信息,股票查询,"name(string): 股票名称或代码",查询平安银行的基本信息
+tushareMcp_get_hk_daily,获取港股日线数据,港股数据,"ts_code(string): 港股代码, trade_date(string): 交易日期",获取腾讯控股的港股行情
+tushareMcp_get_top_list,获取龙虎榜数据,市场数据,"trade_date(string): 交易日期",查询指定日期的龙虎榜
+tushareMcp_fuzzy_match_stocks,模糊匹配股票,股票搜索,"keyword(string): 搜索关键词",搜索所有银行类股票
+tushareMcp_get_financial_indicators,获取财务指标,财务数据,"ts_code(string): 股票代码, period(string): 报告期",查询股票的财务指标
+tushareMcp_get_daily_basic,获取每日基本面数据,技术分析,"ts_code(string): 股票代码, trade_date(string): 交易日期",获取股票的技术分析数据
+tushareMcp_get_concept,获取概念股数据,概念板块,"concept_name(string): 概念名称",查询新能源概念股
+tushareMcp_get_industry,获取行业数据,行业分析,"industry_name(string): 行业名称",查询银行业股票
+tushareMcp_get_holders,获取股东信息,股东数据,"ts_code(string): 股票代码, end_date(string): 截止日期",查询股票的股东信息
+tushareMcp_get_forecast,获取业绩预告,财务预测,"ts_code(string): 股票代码, ann_date(string): 公告日期",查询业绩预告信息 

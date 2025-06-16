@@ -1,0 +1,303 @@
+问题ID,工具名称,用户类型,问题内容,预期工具调用,难度等级,应用场景,问题特性
+YZ001,get_hm_detail,ToC,今天有哪些知名游资在操作涨停股？请帮我查看,get_hm_detail(trade_date='20231201'),初级,游资涨停监控,具体明确
+YZ002,get_hm_detail,ToC,如何通过游资交易明细发现潜在的涨停机会？,get_hm_detail(),初级,游资跟踪方法,通用宽泛
+YZ003,get_hm_detail,ToC,赵老哥今天买了哪些涨停股？请查看交易记录,get_hm_detail(trade_date='20231201', hm_name='赵老哥'),初级,知名游资跟踪,具体明确
+YZ004,get_hm_detail,ToC,章盟主最近的涨停股操作风格如何？,get_hm_detail(hm_name='章盟主', start_date='20231120', end_date='20231201'),中级,游资风格分析,具体明确
+YZ005,get_hm_detail,ToC,如何识别游资集中买入的涨停股？,get_hm_detail(),中级,游资集中度分析,通用宽泛
+YZ006,get_hm_detail,ToC,小鳄鱼今天有参与打板吗？请查看明细,get_hm_detail(trade_date='20231201', hm_name='小鳄鱼'),初级,游资打板跟踪,具体明确
+YZ007,get_hm_detail,ToC,如何通过游资明细判断涨停股的持续性？,get_hm_detail(),中级,涨停持续性分析,通用宽泛
+YZ008,get_hm_detail,ToC,今天游资最活跃的涨停股是哪只？,get_hm_detail(trade_date='20231201'),初级,游资活跃度查询,具体明确
+YZ009,get_hm_detail,ToC,如何建立游资涨停股跟踪预警系统？,get_hm_detail(),高级,跟踪预警系统,通用宽泛
+YZ010,get_hm_detail,ToC,炒股养家今天有买涨停股吗？,get_hm_detail(trade_date='20231201', hm_name='炒股养家'),初级,知名游资查询,具体明确
+YZ011,get_hm_detail,ToC,游资在涨停股上的平均持股时间是多久？,get_hm_detail(start_date='20231101', end_date='20231201'),中级,持股周期分析,通用宽泛
+YZ012,get_hm_detail,ToC,欢乐海岸最近偏好什么类型的涨停股？,get_hm_detail(hm_name='欢乐海岸', start_date='20231120'),中级,游资偏好分析,具体明确
+YZ013,get_hm_detail,ToC,如何通过游资明细预测明日涨停股？,get_hm_detail(),高级,涨停预测方法,通用宽泛
+YZ014,get_hm_detail,ToC,今天哪些游资在抢筹涨停股？,get_hm_detail(trade_date='20231201'),初级,游资抢筹监控,具体明确
+YZ015,get_hm_detail,ToC,如何分析游资在连板股上的操作策略？,get_hm_detail(),中级,连板操作策略,通用宽泛
+YZ016,get_hm_detail,ToC,方新侠今天参与了哪些涨停股？,get_hm_detail(trade_date='20231201', hm_name='方新侠'),初级,游资参与查询,具体明确
+YZ017,get_hm_detail,ToC,游资最喜欢在什么时间点买入涨停股？,get_hm_detail(),中级,买入时机分析,通用宽泛
+YZ018,get_hm_detail,ToC,今天游资在新能源涨停股上的布局如何？,get_hm_detail(trade_date='20231201'),中级,板块游资布局,具体明确
+YZ019,get_hm_detail,ToC,如何识别游资的涨停股接力模式？,get_hm_detail(),高级,接力模式识别,通用宽泛
+YZ020,get_hm_detail,ToC,乔帮主最近在涨停股上的成功率如何？,get_hm_detail(hm_name='乔帮主', start_date='20231101'),中级,成功率分析,具体明确
+YZ021,get_hm_detail,ToC,游资如何选择涨停股的卖出时机？,get_hm_detail(),中级,卖出时机分析,通用宽泛
+YZ022,get_hm_detail,ToC,今天有多少游资参与了人工智能涨停股？,get_hm_detail(trade_date='20231201'),初级,概念游资参与度,具体明确
+YZ023,get_hm_detail,ToC,如何通过游资明细发现涨停股的主力意图？,get_hm_detail(),高级,主力意图分析,通用宽泛
+YZ024,get_hm_detail,ToC,淘气天尊今天有操作涨停股吗？,get_hm_detail(trade_date='20231201', hm_name='淘气天尊'),初级,游资操作查询,具体明确
+YZ025,get_hm_detail,ToC,游资在涨停股炸板后的处理策略是什么？,get_hm_detail(),中级,炸板处理策略,通用宽泛
+YZ026,get_hm_detail,ToC,今天哪些游资在军工涨停股上有动作？,get_hm_detail(trade_date='20231201'),初级,军工游资动向,具体明确
+YZ027,get_hm_detail,ToC,如何建立游资涨停股的风险控制体系？,get_hm_detail(),高级,风险控制体系,通用宽泛
+YZ028,get_hm_detail,ToC,作手新一最近的涨停股操作记录如何？,get_hm_detail(hm_name='作手新一', start_date='20231120'),中级,操作记录分析,具体明确
+YZ029,get_hm_detail,ToC,游资在涨停股上的资金使用效率如何？,get_hm_detail(),中级,资金效率分析,通用宽泛
+YZ030,get_hm_detail,ToC,今天游资最看好的涨停概念是什么？,get_hm_detail(trade_date='20231201'),初级,概念偏好查询,具体明确
+YZ031,get_hm_detail,ToC,如何通过游资明细判断涨停股的真假突破？,get_hm_detail(),高级,真假突破判断,通用宽泛
+YZ032,get_hm_detail,ToC,古北路今天在涨停股上的表现如何？,get_hm_detail(trade_date='20231201', hm_name='古北路'),初级,席位表现查询,具体明确
+YZ033,get_hm_detail,ToC,游资如何在涨停股集合竞价中布局？,get_hm_detail(),中级,竞价布局策略,通用宽泛
+YZ034,get_hm_detail,ToC,今天有哪些游资在医药涨停股上发力？,get_hm_detail(trade_date='20231201'),初级,医药游资动向,具体明确
+YZ035,get_hm_detail,ToC,如何分析游资涨停股的板块轮动规律？,get_hm_detail(),高级,板块轮动分析,通用宽泛
+YZ036,get_hm_detail,ToC,华鑫奉贤今天参与了哪些涨停股？,get_hm_detail(trade_date='20231201', hm_name='华鑫奉贤'),初级,席位参与查询,具体明确
+YZ037,get_hm_detail,ToC,游资在涨停股上的平均收益率是多少？,get_hm_detail(),中级,收益率分析,通用宽泛
+YZ038,get_hm_detail,ToC,今天游资在芯片涨停股上的布局情况？,get_hm_detail(trade_date='20231201'),初级,芯片游资布局,具体明确
+YZ039,get_hm_detail,ToC,如何识别游资涨停股的洗盘和出货？,get_hm_detail(),高级,洗盘出货识别,通用宽泛
+YZ040,get_hm_detail,ToC,财富大道今天有买入涨停股吗？,get_hm_detail(trade_date='20231201', hm_name='财富大道'),初级,游资买入查询,具体明确
+YZ041,get_hm_detail,ToC,游资如何选择涨停股的最佳买点？,get_hm_detail(),中级,买点选择策略,通用宽泛
+YZ042,get_hm_detail,ToC,今天哪些游资在锂电池涨停股上活跃？,get_hm_detail(trade_date='20231201'),初级,锂电池游资活跃度,具体明确
+YZ043,get_hm_detail,ToC,如何通过游资明细构建涨停股投资组合？,get_hm_detail(),高级,投资组合构建,通用宽泛
+YZ044,get_hm_detail,ToC,机构专用席位今天参与涨停股了吗？,get_hm_detail(trade_date='20231201', hm_name='机构专用'),初级,机构参与查询,具体明确
+YZ045,get_hm_detail,ToC,游资在涨停股上的止损策略是什么？,get_hm_detail(),中级,止损策略分析,通用宽泛
+YZ046,get_hm_detail,ToC,今天游资在白酒涨停股上有什么动作？,get_hm_detail(trade_date='20231201'),初级,白酒游资动向,具体明确
+YZ047,get_hm_detail,ToC,如何建立游资涨停股的量化跟踪模型？,get_hm_detail(),高级,量化跟踪模型,通用宽泛
+YZ048,get_hm_detail,ToC,东方财富拉萨今天操作了哪些涨停股？,get_hm_detail(trade_date='20231201', hm_name='东方财富拉萨'),初级,席位操作查询,具体明确
+YZ049,get_hm_detail,ToC,游资在涨停股上的情绪周期如何把握？,get_hm_detail(),高级,情绪周期把握,通用宽泛
+YZ050,get_hm_detail,ToC,今天游资最关注的涨停股票是哪只？,get_hm_detail(trade_date='20231201'),初级,关注度查询,具体明确
+
+多轮问题ID,分析框架,用户类型,问题内容,预期工具调用链,步骤数,难度等级,应用场景,问题特性
+YZM001,游资涨停股深度跟踪,ToC,我想深度跟踪赵老哥的涨停股操作策略，请帮我全面分析,"1. get_hm_list(name='赵老哥') - 获取赵老哥基本信息
+2. get_hm_detail(hm_name='赵老哥') - 查看最近交易明细
+3. get_kpl_list(tag='涨停') - 对比市场涨停情况
+4. get_top_list() - 查看龙虎榜表现
+5. get_stock_basic_info() - 分析选股特征",5,高级,游资策略研究,具体明确
+YZM002,涨停股游资集中度分析,ToC,如何分析今日涨停股的游资集中度和投资价值？,"1. get_kpl_list(tag='涨停') - 获取今日涨停股列表
+2. get_hm_detail() - 查看游资参与情况
+3. get_top_list() - 分析龙虎榜资金
+4. moneyflow() - 查看资金流向
+5. get_stock_basic_info() - 评估基本面",5,中级,涨停投资分析,通用宽泛
+YZM003,章盟主操作风格研究,ToC,请帮我深度研究章盟主在涨停股上的操作风格和成功经验,"1. get_hm_list(name='章盟主') - 获取章盟主信息
+2. get_hm_detail(hm_name='章盟主') - 分析历史交易记录
+3. get_kpl_concept_cons() - 研究偏好概念板块
+4. get_limit_step() - 分析连板股偏好
+5. stk_factor() - 研究技术指标偏好",5,高级,游资风格分析,具体明确
+YZM004,游资涨停股预警系统,ToC,如何建立基于游资行为的涨停股预警系统？,"1. get_hm_detail() - 监控游资交易行为
+2. get_kpl_list() - 跟踪涨停股情况
+3. get_stk_auction() - 分析集合竞价异动
+4. get_ths_hot() - 结合热榜数据
+5. get_top_list() - 验证龙虎榜",5,高级,预警系统构建,通用宽泛
+YZM005,小鳄鱼涨停股策略,ToC,小鳄鱼在涨停股上有什么独特的操作策略？请分析,"1. get_hm_list(name='小鳄鱼') - 获取小鳄鱼信息
+2. get_hm_detail(hm_name='小鳄鱼') - 分析交易明细
+3. get_kpl_list() - 对比涨停股选择
+4. get_limit_cpt_list() - 分析概念偏好
+5. get_daily() - 研究买卖时机",5,中级,游资策略分析,具体明确
+YZM006,涨停股游资接力模式,ToC,如何识别和跟踪游资在涨停股上的接力模式？,"1. get_kpl_list(tag='涨停') - 获取涨停股数据
+2. get_limit_step() - 分析连板情况
+3. get_hm_detail() - 查看游资参与度
+4. get_top_list() - 分析席位变化
+5. get_stock_basic_info() - 评估标的质量",5,高级,接力模式分析,通用宽泛
+YZM007,炒股养家涨停股研究,ToC,炒股养家在涨停股投资上有什么心得？请深度分析,"1. get_hm_list(name='炒股养家') - 获取基本信息
+2. get_hm_detail(hm_name='炒股养家') - 分析操作记录
+3. get_kpl_concept() - 研究概念偏好
+4. get_ths_daily() - 分析板块选择
+5. daily_basic() - 研究估值偏好",5,高级,知名游资研究,具体明确
+YZM008,游资涨停股风控体系,ToC,如何建立跟随游资操作涨停股的风险控制体系？,"1. get_hm_detail() - 分析游资成功率
+2. get_kpl_list(tag='炸板') - 研究炸板风险
+3. get_top_list() - 分析资金流出情况
+4. stk_factor() - 建立技术止损
+5. moneyflow() - 监控资金变化",5,高级,风控体系构建,通用宽泛
+YZM009,欢乐海岸选股逻辑,ToC,欢乐海岸在涨停股选择上有什么独特的逻辑？,"1. get_hm_list(name='欢乐海岸') - 获取席位信息
+2. get_hm_detail(hm_name='欢乐海岸') - 分析选股记录
+3. get_kpl_concept_cons() - 研究概念偏好
+4. get_ths_member() - 分析板块偏好
+5. get_stock_basic_info() - 总结选股特征",5,中级,选股逻辑分析,具体明确
+YZM010,涨停股游资情绪指标,ToC,如何构建基于游资行为的涨停股情绪指标？,"1. get_hm_detail() - 统计游资参与度
+2. get_kpl_list() - 计算涨停成功率
+3. get_limit_step() - 分析连板持续性
+4. get_top_list() - 评估资金热度
+5. get_ths_hot() - 结合市场热度",5,高级,情绪指标构建,通用宽泛
+YZM011,方新侠涨停股战法,ToC,方新侠在涨停股上有什么经典战法？请详细分析,"1. get_hm_list(name='方新侠') - 获取席位信息
+2. get_hm_detail(hm_name='方新侠') - 分析操作战法
+3. get_kpl_list() - 研究涨停股选择
+4. get_stk_auction() - 分析竞价策略
+5. get_daily() - 研究技术形态偏好",5,中级,战法分析,具体明确
+YZM012,游资涨停股板块轮动,ToC,如何通过游资行为预测涨停股的板块轮动？,"1. get_hm_detail() - 分析游资板块偏好
+2. get_limit_cpt_list() - 跟踪强势概念
+3. get_ths_daily() - 分析板块指数
+4. get_dc_index() - 监控概念热度
+5. get_kpl_concept() - 预测轮动方向",5,高级,板块轮动预测,通用宽泛
+YZM013,乔帮主涨停股心法,ToC,乔帮主在涨停股操作上有什么独特心法？,"1. get_hm_list(name='乔帮主') - 获取基本信息
+2. get_hm_detail(hm_name='乔帮主') - 分析操作心法
+3. get_top_list() - 研究龙虎榜表现
+4. get_limit_step() - 分析连板偏好
+5. moneyflow() - 研究资金运用",5,中级,操作心法研究,具体明确
+YZM014,涨停股游资资金效率,ToC,如何分析游资在涨停股上的资金使用效率？,"1. get_hm_detail() - 统计游资交易数据
+2. get_kpl_list() - 计算涨停成功率
+3. get_top_list() - 分析资金规模
+4. get_daily() - 计算收益率
+5. moneyflow() - 评估资金效率",5,中级,资金效率分析,通用宽泛
+YZM015,淘气天尊涨停股策略,ToC,淘气天尊在涨停股投资上有什么独特策略？,"1. get_hm_list(name='淘气天尊') - 获取席位信息
+2. get_hm_detail(hm_name='淘气天尊') - 分析投资策略
+3. get_kpl_concept() - 研究概念选择
+4. get_ths_index() - 分析板块配置
+5. daily_basic() - 研究估值策略",5,中级,投资策略分析,具体明确
+YZM016,游资涨停股时机把握,ToC,如何学习游资把握涨停股买卖时机的技巧？,"1. get_hm_detail() - 分析游资交易时机
+2. get_stk_auction() - 研究竞价买入
+3. get_kpl_list() - 分析涨停时点
+4. stk_factor() - 研究技术指标
+5. get_top_list() - 分析卖出时机",5,高级,时机把握技巧,通用宽泛
+YZM017,作手新一选股标准,ToC,作手新一选择涨停股有什么标准和要求？,"1. get_hm_list(name='作手新一') - 获取基本信息
+2. get_hm_detail(hm_name='作手新一') - 分析选股标准
+3. get_stock_basic_info() - 研究基本面要求
+4. get_ths_daily() - 分析技术要求
+5. get_kpl_concept_cons() - 总结选股特征",5,中级,选股标准分析,具体明确
+YZM018,涨停股游资协同效应,ToC,如何分析多个游资在同一涨停股上的协同效应？,"1. get_hm_detail() - 统计游资参与情况
+2. get_top_list() - 分析席位协同
+3. get_kpl_list() - 评估协同效果
+4. moneyflow() - 分析资金合力
+5. get_daily() - 评估价格影响",5,高级,协同效应分析,通用宽泛
+YZM019,古北路涨停股战绩,ToC,古北路在涨停股上的历史战绩如何？请分析,"1. get_hm_list(name='古北路') - 获取席位信息
+2. get_hm_detail(hm_name='古北路') - 统计历史战绩
+3. get_kpl_list() - 计算成功率
+4. get_top_list() - 分析龙虎榜表现
+5. get_daily() - 计算收益率",5,中级,历史战绩分析,具体明确
+YZM020,游资涨停股生命周期,ToC,如何分析游资参与的涨停股生命周期？,"1. get_hm_detail() - 跟踪游资参与过程
+2. get_limit_step() - 分析连板周期
+3. get_kpl_list() - 监控涨停持续性
+4. get_top_list() - 分析资金变化
+5. stk_factor() - 研究技术周期",5,高级,生命周期分析,通用宽泛
+YZM021,华鑫奉贤操作特色,ToC,华鑫奉贤在涨停股操作上有什么特色？,"1. get_hm_list(name='华鑫奉贤') - 获取席位信息
+2. get_hm_detail(hm_name='华鑫奉贤') - 分析操作特色
+3. get_kpl_concept() - 研究概念偏好
+4. get_limit_cpt_list() - 分析板块选择
+5. get_stk_auction() - 研究交易习惯",5,中级,操作特色分析,具体明确
+YZM022,涨停股游资情报系统,ToC,如何建立涨停股游资情报收集和分析系统？,"1. get_hm_detail() - 建立游资监控
+2. get_kpl_list() - 建立涨停监控
+3. get_top_list() - 建立龙虎榜监控
+4. get_ths_hot() - 建立热点监控
+5. get_stk_auction() - 建立竞价监控",5,高级,情报系统构建,通用宽泛
+YZM023,财富大道投资理念,ToC,财富大道在涨停股投资上有什么理念？,"1. get_hm_list(name='财富大道') - 获取席位信息
+2. get_hm_detail(hm_name='财富大道') - 分析投资理念
+3. get_kpl_concept_cons() - 研究投资偏好
+4. daily_basic() - 分析估值理念
+5. get_ths_daily() - 研究趋势理念",5,中级,投资理念分析,具体明确
+YZM024,游资涨停股风险识别,ToC,如何识别跟随游资操作涨停股的各种风险？,"1. get_hm_detail() - 分析游资失败案例
+2. get_kpl_list(tag='炸板') - 研究炸板风险
+3. get_top_list() - 分析资金撤离
+4. stk_factor() - 识别技术风险
+5. get_stock_basic_info() - 识别基本面风险",5,高级,风险识别体系,通用宽泛
+YZM025,机构专用涨停参与,ToC,机构专用席位参与涨停股有什么特点？,"1. get_hm_list(name='机构专用') - 获取机构信息
+2. get_hm_detail(hm_name='机构专用') - 分析参与特点
+3. get_top_inst() - 对比机构行为
+4. get_kpl_list() - 分析涨停选择
+5. daily_basic() - 研究估值偏好",5,中级,机构参与分析,具体明确
+YZM026,涨停股游资传承模式,ToC,如何分析游资在涨停股上的传承和接力模式？,"1. get_hm_detail() - 分析游资接力行为
+2. get_limit_step() - 跟踪连板传承
+3. get_top_list() - 分析席位变化
+4. get_kpl_list() - 监控传承效果
+5. moneyflow() - 分析资金传承",5,高级,传承模式分析,通用宽泛
+YZM027,东方财富拉萨战法,ToC,东方财富拉萨在涨停股上有什么经典战法？,"1. get_hm_list(name='东方财富拉萨') - 获取席位信息
+2. get_hm_detail(hm_name='东方财富拉萨') - 分析经典战法
+3. get_kpl_concept() - 研究概念战法
+4. get_stk_auction() - 分析竞价战法
+5. get_daily() - 研究技术战法",5,中级,经典战法分析,具体明确
+YZM028,游资涨停股量化模型,ToC,如何构建基于游资行为的涨停股量化选股模型？,"1. get_hm_detail() - 收集游资行为数据
+2. get_kpl_list() - 建立涨停数据库
+3. stk_factor() - 构建技术因子
+4. get_stock_basic_info() - 构建基本面因子
+5. moneyflow() - 构建资金因子",5,高级,量化模型构建,通用宽泛
+YZM029,游资涨停股心理分析,ToC,如何分析游资在涨停股操作中的心理特征？,"1. get_hm_detail() - 分析游资行为模式
+2. get_kpl_list() - 研究成功失败案例
+3. get_top_list() - 分析压力下表现
+4. get_limit_step() - 研究贪婪恐惧
+5. stk_factor() - 分析情绪指标",5,高级,心理特征分析,通用宽泛
+YZM030,涨停股游资生态系统,ToC,如何理解涨停股市场中的游资生态系统？,"1. get_hm_detail() - 分析游资关系网络
+2. get_top_list() - 研究席位互动
+3. get_kpl_list() - 分析竞争合作
+4. get_limit_cpt_list() - 研究板块分工
+5. get_ths_hot() - 分析影响力层次",5,高级,生态系统分析,通用宽泛
+YZM031,游资涨停股教学体系,ToC,如何建立学习游资涨停股操作的教学体系？,"1. get_hm_detail() - 建立案例库
+2. get_kpl_list() - 建立实战库
+3. get_top_list() - 建立分析库
+4. stk_factor() - 建立技术库
+5. get_stock_basic_info() - 建立基础库",5,高级,教学体系构建,通用宽泛
+YZM032,涨停股游资评级系统,ToC,如何建立游资在涨停股操作上的评级系统？,"1. get_hm_detail() - 统计操作数据
+2. get_kpl_list() - 计算成功率
+3. get_top_list() - 评估影响力
+4. get_daily() - 计算收益率
+5. moneyflow() - 评估资金效率",5,高级,评级系统构建,通用宽泛
+YZM033,游资涨停股趋势预测,ToC,如何通过游资行为预测涨停股的未来趋势？,"1. get_hm_detail() - 分析游资趋势偏好
+2. get_limit_cpt_list() - 预测概念轮动
+3. get_ths_daily() - 分析板块趋势
+4. get_dc_index() - 监控热度变化
+5. get_kpl_concept() - 预测题材方向",5,高级,趋势预测模型,通用宽泛
+YZM034,涨停股游资风格分类,ToC,如何对参与涨停股的游资进行风格分类？,"1. get_hm_detail() - 收集游资操作数据
+2. get_kpl_concept_cons() - 分析概念偏好
+3. get_limit_step() - 分析连板偏好
+4. stk_factor() - 分析技术偏好
+5. daily_basic() - 分析估值偏好",5,中级,风格分类体系,通用宽泛
+YZM035,游资涨停股成功密码,ToC,如何破解游资在涨停股上的成功密码？,"1. get_hm_detail() - 分析成功案例
+2. get_kpl_list() - 研究成功模式
+3. get_top_list() - 分析成功要素
+4. get_stock_basic_info() - 总结成功特征
+5. stk_factor() - 提炼成功指标",5,高级,成功密码解析,通用宽泛
+YZM036,涨停股游资监管影响,ToC,监管政策对游资涨停股操作有什么影响？,"1. get_hm_detail() - 分析政策前后变化
+2. get_kpl_list() - 对比涨停数据
+3. get_top_list() - 分析龙虎榜变化
+4. get_limit_step() - 分析连板影响
+5. moneyflow() - 分析资金变化",5,中级,监管影响分析,通用宽泛
+YZM037,游资涨停股国际比较,ToC,中国游资涨停股模式与国际市场有何不同？,"1. get_hm_detail() - 分析中国游资特征
+2. get_kpl_list() - 分析涨停机制
+3. get_top_list() - 分析交易制度
+4. get_ths_hot() - 分析市场结构
+5. moneyflow() - 分析资金特点",5,高级,国际比较分析,通用宽泛
+YZM038,涨停股游资技术创新,ToC,游资在涨停股操作上有哪些技术创新？,"1. get_hm_detail() - 分析操作技术演进
+2. get_stk_auction() - 研究竞价技术
+3. get_kpl_list() - 分析选股技术
+4. stk_factor() - 研究分析技术
+5. get_top_list() - 研究交易技术",5,中级,技术创新分析,通用宽泛
+YZM039,游资涨停股文化研究,ToC,涨停股游资圈有什么独特的文化特征？,"1. get_hm_detail() - 研究游资行为文化
+2. get_hm_list() - 分析游资命名文化
+3. get_top_list() - 研究席位文化
+4. get_kpl_list() - 研究涨停文化
+5. get_ths_hot() - 研究热点文化",5,中级,文化特征研究,通用宽泛
+YZM040,涨停股游资未来展望,ToC,涨停股游资模式的未来发展趋势如何？,"1. get_hm_detail() - 分析当前发展状况
+2. get_kpl_list() - 预测涨停趋势
+3. get_top_list() - 预测监管趋势
+4. get_ths_hot() - 预测技术趋势
+5. moneyflow() - 预测资金趋势",5,高级,未来趋势展望,通用宽泛
+YZM041,游资涨停股实战训练,ToC,如何设计游资涨停股操作的实战训练体系？,"1. get_hm_detail() - 设计模拟交易
+2. get_kpl_list() - 设计选股训练
+3. get_stk_auction() - 设计竞价训练
+4. get_top_list() - 设计分析训练
+5. stk_factor() - 设计技术训练",5,高级,实战训练体系,通用宽泛
+YZM042,涨停股游资数据挖掘,ToC,如何对游资涨停股数据进行深度挖掘？,"1. get_hm_detail() - 收集游资数据
+2. get_kpl_list() - 收集涨停数据
+3. get_top_list() - 收集龙虎榜数据
+4. stk_factor() - 收集技术数据
+5. get_stock_basic_info() - 收集基本面数据",5,高级,数据挖掘体系,通用宽泛
+YZM043,游资涨停股风险管理,ToC,如何建立完善的游资涨停股风险管理体系？,"1. get_hm_detail() - 建立游资风险监控
+2. get_kpl_list(tag='炸板') - 建立炸板风险控制
+3. get_top_list() - 建立资金风险管理
+4. stk_factor() - 建立技术风险控制
+5. moneyflow() - 建立流动性风险管理",5,高级,风险管理体系,通用宽泛
+YZM044,涨停股游资绩效评估,ToC,如何科学评估游资在涨停股上的投资绩效？,"1. get_hm_detail() - 收集绩效数据
+2. get_kpl_list() - 计算成功率指标
+3. get_daily() - 计算收益率指标
+4. get_top_list() - 计算影响力指标
+5. moneyflow() - 计算效率指标",5,中级,绩效评估体系,通用宽泛
+YZM045,游资涨停股智能分析,ToC,如何运用人工智能分析游资涨停股行为？,"1. get_hm_detail() - 构建行为数据集
+2. get_kpl_list() - 构建涨停数据集
+3. stk_factor() - 构建技术特征
+4. get_stock_basic_info() - 构建基本面特征
+5. moneyflow() - 构建资金特征",5,高级,智能分析系统,通用宽泛
+YZM046,涨停股游资社交网络,ToC,如何分析游资在涨停股操作中的社交网络？,"1. get_hm_detail() - 分析游资关联交易
+2. get_top_list() - 分析席位关联
+3. get_kpl_list() - 分析协同操作
+4. get_hm_list() - 构建关系图谱
+5. moneyflow() - 分析资金关联",5,高级,社交网络分析,通用宽泛
+YZM047,游资涨停股心理博弈,ToC,如何理解游资涨停股操作中的心理博弈？,"1. get_hm_detail() - 分析博弈行为
+2. get_kpl_list() - 分析竞争策略
+3. get_top_list() - 分析对抗模式
+4. get_limit_step() - 分析接力博弈
+5. stk_factor() - 分析情绪博弈",5,高级,心理博弈分析,通用宽泛
+YZM048,涨停股游资制度研究,ToC,涨停板制度对游资操作模式有什么影响？,"1. get_kpl_list() - 分析涨停制度特点
+2. get_hm_detail() - 分析游资适应策略
+3. get_top_list() - 分析制度套利
+4. get_limit_step() - 分析连板机制
+5. moneyflow() - 分析资金效应",5,中级,制度影响研究,通用宽泛
+YZM049,游资涨停股教育价值,ToC,游资涨停股操作对投资者教育有什么价值？,"1. get_hm_detail() - 提炼教育案例
+2. get_kpl_list() - 总结操作经验
+3. get_top_list() - 分析成败得失
+4. stk_factor() - 传授技术方法
+5. get_stock_basic_info() - 普及基础知识",5,中级,教育价值分析,通用宽泛
+YZM050,涨停股游资传奇故事,ToC,有哪些经典的游资涨停股传奇故事值得学习？,"1. get_hm_detail() - 收集传奇案例
+2. get_kpl_list() - 还原历史场景
+3. get_top_list() - 分析成功要素
+4. get_daily() - 展示收益奇迹
+5. get_stock_basic_info() - 总结投资智慧",5,中级,传奇故事分析,通用宽泛 
