@@ -15,12 +15,14 @@ Intelligent Tool Selector Module
 
 try:
     from .core.selector import IntelligentToolSelector
+    from .core.multi_turn_selector import MultiTurnToolSelector
     from .core.json_parser import JSONParser
     from .utils.mcp_client import MCPClientManager
     from .utils.config import Config
 except ImportError:
     # 如果相对导入失败，尝试绝对导入
     from intelligent_tool_selector.core.selector import IntelligentToolSelector
+    from intelligent_tool_selector.core.multi_turn_selector import MultiTurnToolSelector
     from intelligent_tool_selector.core.json_parser import JSONParser
     from intelligent_tool_selector.utils.mcp_client import MCPClientManager
     from intelligent_tool_selector.utils.config import Config
@@ -30,6 +32,7 @@ __author__ = "xDAN-Agent Team"
 
 __all__ = [
     "IntelligentToolSelector",
+    "MultiTurnToolSelector",
     "JSONParser", 
     "MCPClientManager",
     "Config"

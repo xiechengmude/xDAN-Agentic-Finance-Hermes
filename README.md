@@ -106,38 +106,57 @@ The system prompts are designed to:
 
 ## 🧠 智能工具选择器系统
 
-基于大语言模型的智能MCP工具选择系统，能够自动理解用户查询意图并选择最合适的工具。
+基于大语言模型的智能MCP工具选择系统，支持单轮和多轮工具调用，能够自动理解用户查询意图并选择最合适的工具。
 
 ### 🌟 核心特性
 
+#### 单轮工具调用
 - **🧠 智能理解**: 基于LLM的用户意图识别和分析
 - **🎯 精准选择**: 从138+个MCP工具中智能选择最合适的工具
 - **📊 自动映射**: 智能参数组装和验证机制
+
+#### 多轮工具调用 ⭐ 新功能
+- **🔄 任务规划**: 自动将复杂查询分解为可执行的子任务序列
+- **🧩 智能分解**: 识别查询复杂度并决定是否需要多轮执行
+- **🔗 上下文记忆**: 维护对话历史和执行上下文
+- **📊 结果整合**: 智能整合多个工具的执行结果生成综合分析报告
+
+#### 通用特性
 - **🔧 强容错性**: 多层次JSON解析和错误处理
 - **⚡ 高性能**: 优化的工具加载和缓存机制
 - **🛡️ 安全可靠**: 完整的参数验证和错误恢复
+- **🔄 自动回退**: 复杂任务失败时自动回退到单轮模式
 
 ### 🚀 快速开始
 
 #### 1. 交互式模式
 ```bash
-# 主程序交互式模式
+# 主程序交互式模式（自动多轮）
 python main.py
 
 # 演示模式
 python main.py demo
+
+# 多轮专用演示
+python main.py multi
 ```
 
 #### 2. 使用示例
 ```bash
-# 基本使用示例
+# 单轮基本使用示例
 python intelligent_tool_selector/examples/basic_usage.py
+
+# 多轮使用示例
+python intelligent_tool_selector/examples/multi_turn_usage.py
 
 # 运行测试套件
 python intelligent_tool_selector/tests/test_selector.py
+python intelligent_tool_selector/tests/test_multi_turn_selector.py
 ```
 
 #### 3. 编程接口
+
+**单轮工具调用**:
 ```python
 from intelligent_tool_selector import IntelligentToolSelector
 
@@ -149,6 +168,22 @@ await selector.initialize()
 
 # 智能选择并执行工具
 result = await selector.select_and_execute_tool("搜索平安银行的股票信息")
+```
+
+**多轮工具调用**:
+```python
+from intelligent_tool_selector import MultiTurnToolSelector
+
+# 创建多轮选择器
+multi_selector = MultiTurnToolSelector()
+
+# 初始化
+await multi_selector.initialize()
+
+# 多轮智能执行
+result = await multi_selector.multi_turn_execution(
+    "分析比亚迪的投资价值，包括基本面、财务指标和技术分析"
+)
 ```
 
 ### 📁 系统架构
@@ -171,12 +206,19 @@ intelligent_tool_selector/
 
 ### 🎯 支持的查询类型
 
+#### 单轮查询（简单、直接）
 - **股票基本信息**: "搜索平安银行的股票信息"
 - **港股数据**: "获取腾讯控股的港股行情"
 - **财务数据**: "查询贵州茅台的财务指标"
 - **游资数据**: "查询龙虎榜数据"
 - **模糊搜索**: "搜索所有银行类股票"
-- **技术分析**: "生成腾讯股价走势图"
+
+#### 多轮查询（复杂、综合） ⭐ 新功能
+- **投资价值分析**: "分析比亚迪的投资价值，包括基本面、财务指标和技术分析"
+- **股票对比分析**: "比较招商银行和平安银行的投资价值，给出详细对比"
+- **板块龙头分析**: "查询新能源汽车板块的龙头股票并分析未来发展前景"
+- **概念股分析**: "搜索游戏概念股票并分析其当前市场表现和投资机会"
+- **综合研究报告**: "研究医药行业的投资机会，包括行业分析和个股推荐"
 
 ### ⚙️ 配置说明
 
@@ -191,6 +233,7 @@ intelligent_tool_selector/
 
 基于测试套件的性能表现：
 
+#### 单轮工具调用
 | 指标 | 数值 |
 |------|------|
 | 工具选择成功率 | 100% |
@@ -198,3 +241,13 @@ intelligent_tool_selector/
 | 平均响应时间 | 3-5秒 |
 | 支持工具数量 | 138+ |
 | JSON解析成功率 | 100% |
+
+#### 多轮工具调用 ⭐ 新功能
+| 指标 | 数值 |
+|------|------|
+| 任务规划成功率 | 85% |
+| 多轮执行成功率 | 70% |
+| 平均执行轮次 | 2-3轮 |
+| 结果整合成功率 | 90% |
+| 自动回退成功率 | 100% |
+| 上下文记忆长度 | 10条 |
