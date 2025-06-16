@@ -14,6 +14,7 @@ from ..utils.config import Config
 from ..utils.mcp_client import MCPClientManager
 from .json_parser import JSONParser
 from .selector import IntelligentToolSelector
+from .parallel_executor import ParallelExecutor
 
 
 class MultiTurnToolSelector:
@@ -23,7 +24,9 @@ class MultiTurnToolSelector:
                  mcp_server_url: Optional[str] = None,
                  model_url: Optional[str] = None,
                  model_name: Optional[str] = None,
-                 max_turns: int = 5):
+                 max_turns: int = 5,
+                 enable_parallel: bool = True,
+                 max_concurrent_tasks: int = 3):
         """
         初始化多轮工具选择器
         
@@ -32,6 +35,8 @@ class MultiTurnToolSelector:
             model_url: 模型服务器URL
             model_name: 模型名称
             max_turns: 最大轮次
+            enable_parallel: 是否启用并行执行
+            max_concurrent_tasks: 最大并发任务数
         """
         # 继承单轮选择器的能力
         self.single_turn_selector = IntelligentToolSelector(
@@ -60,6 +65,10 @@ class MultiTurnToolSelector:
         
         # 多轮配置
         self.max_turns = max_turns
+        self.enable_parallel = enable_parallel
+        
+        # 并行执行器
+        self.parallel_executor = ParallelExecutor(max_concurrent_tasks) if enable_parallel else None
         
         # 上下文记忆
         self.conversation_context = []
@@ -104,7 +113,7 @@ class MultiTurnToolSelector:
                 print("⚠️ 任务无法分解，回退到单轮模式")
                 return await self._fallback_to_single_turn(complex_query)
             
-            # 2. 多轮执行阶段
+            # 2. 多轮执行阶段（支持并行优化）
             execution_summary = await self._execute_multi_turn_plan(task_plan)
             
             # 3. 结果整合阶段
@@ -172,7 +181,7 @@ class MultiTurnToolSelector:
     
     async def _execute_multi_turn_plan(self, task_plan: Dict[str, Any]) -> Dict[str, Any]:
         """
-        执行多轮任务计划
+        执行多轮任务计划（支持并行优化）
         
         Args:
             task_plan: 任务规划结果
@@ -187,10 +196,69 @@ class MultiTurnToolSelector:
             'total_tasks': len(sub_tasks),
             'completed_tasks': 0,
             'failed_tasks': 0,
-            'task_results': []
+            'task_results': [],
+            'execution_mode': 'unknown'
         }
         
-        for i, task in enumerate(sub_tasks[:self.max_turns], 1):
+        # 限制任务数量
+        sub_tasks = sub_tasks[:self.max_turns]
+        
+        # 检查是否可以并行执行
+        if self.enable_parallel and self.parallel_executor and len(sub_tasks) > 1:
+            try:
+                # 分析并行执行可能性
+                optimization_plan = self.parallel_executor.optimize_execution_plan(sub_tasks)
+                self.parallel_executor.print_optimization_summary(optimization_plan)
+                
+                if optimization_plan['can_parallelize']:
+                    # 并行执行
+                    execution_summary['execution_mode'] = 'parallel'
+                    task_results = await self.parallel_executor.execute_levels_parallel(
+                        optimization_plan['execution_levels'],
+                        self.single_turn_selector.select_and_execute_tool,
+                        self._update_context
+                    )
+                else:
+                    # 回退到串行执行
+                    print("⚠️ 无法并行执行，回退到串行模式")
+                    execution_summary['execution_mode'] = 'serial_fallback'
+                    task_results = await self._execute_serial(sub_tasks)
+                    
+            except Exception as e:
+                print(f"❌ 并行执行出错，回退到串行模式: {e}")
+                execution_summary['execution_mode'] = 'serial_fallback'
+                task_results = await self._execute_serial(sub_tasks)
+        else:
+            # 串行执行
+            execution_summary['execution_mode'] = 'serial'
+            task_results = await self._execute_serial(sub_tasks)
+        
+        # 统计结果
+        for task_result in task_results:
+            self.execution_results.append(task_result)
+            execution_summary['task_results'].append(task_result)
+            
+            if task_result['result'].get('success'):
+                execution_summary['completed_tasks'] += 1
+            else:
+                execution_summary['failed_tasks'] += 1
+        
+        print(f"\n📊 多轮执行完成 ({execution_summary['execution_mode']}): {execution_summary['completed_tasks']}/{execution_summary['total_tasks']} 成功")
+        return execution_summary
+    
+    async def _execute_serial(self, sub_tasks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        串行执行任务列表
+        
+        Args:
+            sub_tasks: 子任务列表
+            
+        Returns:
+            执行结果列表
+        """
+        task_results = []
+        
+        for i, task in enumerate(sub_tasks, 1):
             print(f"\n🎯 执行第 {i} 轮任务: {task.get('description', task.get('query', ''))}")
             
             try:
@@ -203,20 +271,18 @@ class MultiTurnToolSelector:
                     'turn': i,
                     'task': task,
                     'result': result,
-                    'timestamp': datetime.now().isoformat()
+                    'timestamp': datetime.now().isoformat(),
+                    'execution_mode': 'serial'
                 }
                 
-                self.execution_results.append(task_result)
-                execution_summary['task_results'].append(task_result)
+                task_results.append(task_result)
                 
                 if result.get('success'):
-                    execution_summary['completed_tasks'] += 1
                     print(f"✅ 第 {i} 轮任务执行成功")
                     
                     # 更新上下文
                     self._update_context(task_query, result)
                 else:
-                    execution_summary['failed_tasks'] += 1
                     print(f"❌ 第 {i} 轮任务执行失败: {result.get('error')}")
                 
                 # 短暂延迟，避免请求过快
@@ -224,18 +290,17 @@ class MultiTurnToolSelector:
                 
             except Exception as e:
                 print(f"❌ 第 {i} 轮任务执行异常: {e}")
-                execution_summary['failed_tasks'] += 1
                 
                 error_result = {
                     'turn': i,
                     'task': task,
                     'result': {'success': False, 'error': str(e)},
-                    'timestamp': datetime.now().isoformat()
+                    'timestamp': datetime.now().isoformat(),
+                    'execution_mode': 'serial'
                 }
-                execution_summary['task_results'].append(error_result)
+                task_results.append(error_result)
         
-        print(f"\n📊 多轮执行完成: {execution_summary['completed_tasks']}/{execution_summary['total_tasks']} 成功")
-        return execution_summary
+        return task_results
     
     async def _integrate_results(self, original_query: str, execution_summary: Dict[str, Any]) -> Dict[str, Any]:
         """
