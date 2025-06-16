@@ -189,8 +189,13 @@ async def main():
             print("🔧 多轮工具调用专用演示")
             from intelligent_tool_selector.examples.multi_turn_usage import main as multi_main
             await multi_main()
+        elif sys.argv[1] == "parallel":
+            # 并行执行演示模式
+            print("⚡ 并行执行优化演示")
+            from demo_parallel_execution import main as parallel_demo
+            await parallel_demo()
         else:
-            print("可用参数: demo (演示模式), multi (多轮演示)")
+            print("可用参数: demo (演示模式), multi (多轮演示), parallel (并行演示)")
             await interactive_mode()
     else:
         await interactive_mode()
