@@ -1,0 +1,12 @@
+
+> frontend@0.0.0 dev
+> vite
+
+
+  VITE v6.3.4  ready in 265 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+1:25:36 PM [vite] (client) page reload chrome-extension/popup.html
+1:25:39 PM [vite] (client) page reload chrome-extension/popup.html
+1:29:23 PM [vite] (client) page reload chrome-extension/popup.html
