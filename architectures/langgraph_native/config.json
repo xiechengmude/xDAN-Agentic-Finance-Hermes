@@ -1,0 +1,32 @@
+{
+  "name": "LangGraph原生架构",
+  "version": "0.5.0",
+  "description": "基于LangGraph官方SDK的原生实现",
+  "architecture": "langgraph_native_mcp",
+  "features": [
+    "LangGraph StateGraph",
+    "官方MCP集成",
+    "ToolNode支持",
+    "事件流处理"
+  ],
+  "entry_points": {
+    "api_server": "python run.py --mode api --port 8001",
+    "test": "python run.py --mode test"
+  },
+  "dependencies": [
+    "langgraph>=0.1.0",
+    "langchain-core>=0.2.0",
+    "langchain-openai>=0.1.0"
+  ],
+  "performance": {
+    "success_rate": "71.43%",
+    "avg_response_time": "12.60s",
+    "parallel_improvement": "0%"
+  },
+  "status": "开发中",
+  "roadmap": [
+    "完善MCP工具集成",
+    "实现并行执行",
+    "多轮对话支持"
+  ]
+}

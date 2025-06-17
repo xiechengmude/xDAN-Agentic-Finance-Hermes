@@ -1,0 +1,42 @@
+{
+  "test_time": "2025-06-17 18:57:50",
+  "results": {
+    "initialization": "✅ 成功",
+    "graph_nodes": [
+      "__start__",
+      "agent",
+      "tools"
+    ],
+    "state_graph": "✅ 成功",
+    "mcp_tools": "❌ 无工具属性",
+    "streaming_execution": {
+      "status": "✅ 成功",
+      "events": 1,
+      "time": "12.60s"
+    },
+    "health_check": {
+      "status": "✅ 成功",
+      "info": {
+        "status": "healthy",
+        "initialized": true,
+        "tools_available": 3,
+        "timestamp": "2025-06-17T18:57:50.290258",
+        "architecture": "langgraph_native_mcp"
+      }
+    },
+    "thread_management": {
+      "create": "✅ 成功",
+      "thread_id": "thread_20250617_185750",
+      "status": {
+        "status": "active",
+        "created_at": "2025-06-17T18:57:50.290319",
+        "architecture": "langgraph_native_mcp"
+      }
+    }
+  },
+  "statistics": {
+    "total": 7,
+    "successful": 5,
+    "success_rate": 71.42857142857143
+  }
+}

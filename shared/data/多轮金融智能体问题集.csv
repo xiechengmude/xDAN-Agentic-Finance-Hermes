@@ -1,0 +1,21 @@
+问题编号,问题类别,具体问题,涉及工具,预期轮数,难度等级,应用场景
+1,基金投资,我想构建一个稳健的基金投资组合，请帮我分析易方达、华夏、南方基金公司旗下的优质混合型基金，并给出配置建议。,"fund_SearchFunds, fund_BatchGetFundsDetail, fund_GetBatchFundPerformance, fund_GetAssetAllocation",4-5,中等,个人投资理财
+2,股票分析,今天龙虎榜上有哪些热门股票？请分析排名前5的股票的财务状况、资金流向和投资价值。,"blockTrade_block_trade, moneyflow_moneyflow, income_income, balancesheet_balancesheet",4-6,中等,短线投资决策
+3,板块分析,当前市场上哪些概念板块最活跃？请分析新能源、人工智能、生物医药板块的资金流向和投资机会。,"concept_concept, conceptDetail_concept_detail, moneyflowIndThs_moneyflow_ind_ths, moneyflowCntThs_moneyflow_cnt_ths",3-4,中等,主题投资策略
+4,题材挖掘,今天涨停的股票都有哪些共同题材？请分析这些题材的持续性和投资逻辑。,"stkFactor_stk_factor, conceptDetail_concept_detail, moneyflow_moneyflow, stkSurv_stk_surv",4-5,较难,热点追踪
+5,基金经理,请分析张坤、刘彦春等知名基金经理的投资风格，并推荐他们管理的优质基金。,"fund_SearchFunds, fund_BatchGetFundsHolding, fund_BatchGetFundPerformance, fund_SearchManagerViewpoint",3-4,中等,基金选择
+6,资金流向,最近一周沪深港通的资金流向如何？外资偏好哪些行业和个股？,"moneyflowHsgt_moneyflow_hsgt, moneyflowIndThs_moneyflow_ind_ths, top10Holders_top10_holders",3-4,中等,市场分析
+7,行业分析,白酒行业当前的投资价值如何？请分析茅台、五粮液、剑南春等龙头企业的财务表现和估值水平。,"income_income, balancesheet_balancesheet, finaIndicator_fina_indicator, moneyflow_moneyflow",4-5,中等,行业投资
+8,定投策略,我想做基金定投，请帮我选择3-5只不同类型的基金，并制定定投计划。,"fund_SearchFunds, fund_BatchGetFundTradeRules, fund_GetAssetAllocationPlan, fund_MonteCarloSimulate",4-6,较难,长期投资规划
+9,机构调研,最近机构调研最多的公司有哪些？这些公司的基本面如何？,"stkSurv_stk_surv, income_income, balancesheet_balancesheet, finaIndicator_fina_indicator",3-4,中等,价值投资
+10,融资融券,当前融资融券市场的情况如何？哪些股票的融资买入最活跃？,"margin_margin, marginDetail_margin_detail, marginSecs_margin_secs",3-4,中等,市场情绪分析
+11,股东变动,最近有哪些上市公司出现重要股东增减持？这对股价有什么影响？,"stkHoldertrade_stk_holdertrade, top10Holders_top10_holders, moneyflow_moneyflow",3-4,中等,公司治理分析
+12,基金分红,年底了，哪些基金可能会分红？请分析基金分红对投资收益的影响。,"fund_BatchGetFundsDividendRecord, fund_BatchGetFundNavHistory, fund_GetBatchFundPerformance",3-4,简单,收益管理
+13,行业轮动,当前市场处于什么阶段？哪些行业值得重点关注？请制定行业轮动策略。,"moneyflowIndThs_moneyflow_ind_ths, conceptDetail_concept_detail, stkFactor_stk_factor",4-5,较难,策略制定
+14,大宗交易,最近大宗交易比较活跃的股票有哪些？这些交易对股价走势有什么影响？,"blockTrade_block_trade, moneyflow_moneyflow, stkFactor_stk_factor",3-4,中等,异常交易分析
+15,风险评估,我的风险承受能力中等，请帮我评估几只热门基金的风险水平，并给出投资建议。,"fund_AnalyzeFundRisk, fund_GetBatchFundPerformance, fund_AnalyzePortfolioRisk",3-4,中等,风险管理
+16,财报分析,三季报披露期间，哪些公司的业绩超预期？请分析投资机会。,"forecast_forecast, express_express, income_income, finaIndicator_fina_indicator",4-5,中等,业绩驱动投资
+17,转融通,转融通市场的最新情况如何？哪些股票的转融券交易比较活跃？,"slbSec_slb_sec, slbSecDetail_slb_sec_detail, slbLen_slb_len",3-4,较难,专业交易分析
+18,基金持仓,请分析当前公募基金的重仓股有哪些变化？哪些股票被基金经理集中持有？,"fund_BatchGetFundsHolding, fund_BatchGetFundsHolderInfo, top10Floatholders_top10_floatholders",3-4,中等,机构行为分析
+19,质押风险,当前市场上哪些公司存在较高的股权质押风险？这些风险如何影响投资决策？,"pledgeStat_pledge_stat, pledgeDetail_pledge_detail, stkHoldernumber_stk_holdernumber",3-4,较难,风险预警
+20,组合诊断,我目前持有5只基金，请帮我诊断投资组合的风险收益特征，并提出优化建议。,"fund_DiagnoseFundPortfolio, fund_GetFundsCorrelation, fund_GetAssetAllocation, fund_GetFundsBackTest",4-6,较难,投资组合优化 

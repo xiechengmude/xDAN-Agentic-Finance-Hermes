@@ -1,0 +1,133 @@
+{
+  "timestamp": "2025-06-17T00:36:50.677658",
+  "summary": {
+    "total_tests": 10,
+    "passed_tests": 9,
+    "failed_tests": 1,
+    "success_rate": 90.0
+  },
+  "categories": {
+    "基本功能": {
+      "total": 2,
+      "passed": 2
+    },
+    "工具选择准确性": {
+      "total": 3,
+      "passed": 2
+    },
+    "参数映射": {
+      "total": 1,
+      "passed": 1
+    },
+    "错误处理": {
+      "total": 1,
+      "passed": 1
+    },
+    "边界情况": {
+      "total": 3,
+      "passed": 3
+    }
+  },
+  "detailed_results": [
+    {
+      "category": "基本功能",
+      "name": "工具计数",
+      "success": true,
+      "description": "验证工具数量大于0"
+    },
+    {
+      "category": "基本功能",
+      "name": "初始化状态",
+      "success": true,
+      "description": "验证选择器已初始化"
+    },
+    {
+      "category": "工具选择准确性",
+      "name": "股票基本信息查询",
+      "success": false,
+      "selected_tool": "tushareMcp_search_stocks",
+      "query": "搜索平安银行的股票信息"
+    },
+    {
+      "category": "工具选择准确性",
+      "name": "港股数据查询",
+      "success": true,
+      "selected_tool": "tushareMcp_get_hk_basic",
+      "query": "获取腾讯控股的港股数据"
+    },
+    {
+      "category": "工具选择准确性",
+      "name": "龙虎榜数据查询",
+      "success": true,
+      "selected_tool": "tushareMcp_get_top_list",
+      "query": "查询龙虎榜数据"
+    },
+    {
+      "category": "参数映射",
+      "name": "参数组装",
+      "success": true,
+      "parameters": {
+        "keyword": "中国银行"
+      },
+      "query": "搜索中国银行的股票"
+    },
+    {
+      "category": "错误处理",
+      "name": "无效查询处理",
+      "success": true,
+      "query": "这是一个完全无关的查询，不涉及任何金融数据",
+      "result": {
+        "success": false,
+        "error": "Error calling tool 'miraSearchMcp_search_input': HTTPConnectionPool(host='34.124.211.73', port=8000): Max retries exceeded with url: /search/solve (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7fe7d53fdc60>, 'Connection to 34.124.211.73 timed out. (connect timeout=None)'))",
+        "selection_result": {
+          "analysis": {
+            "user_intent": "用户明确表示查询与金融数据无关，可能为测试或误操作",
+            "data_type_needed": "非金融数据（如天气、新闻等）",
+            "time_scope": "无明确时间范围",
+            "complexity": "极低"
+          },
+          "tool_selection": {
+            "primary_tool": {
+              "name": "miraSearchMcp_search_input",
+              "reason": "唯一支持通用搜索的工具，可处理非金融数据查询（尽管实际可能无法返回有效结果）",
+              "confidence": 0.1
+            },
+            "alternative_tools": []
+          },
+          "parameter_mapping": {
+            "inputs": "用户问题内容（但用户未提供具体搜索关键词）"
+          }
+        },
+        "execution_result": {
+          "tool_name": "miraSearchMcp_search_input",
+          "parameters": {
+            "inputs": "用户问题内容（但用户未提供具体搜索关键词）"
+          },
+          "response": null,
+          "message": "Error calling tool 'miraSearchMcp_search_input': HTTPConnectionPool(host='34.124.211.73', port=8000): Max retries exceeded with url: /search/solve (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7fe7d53fdc60>, 'Connection to 34.124.211.73 timed out. (connect timeout=None)'))"
+        }
+      }
+    },
+    {
+      "category": "边界情况",
+      "name": "空查询",
+      "success": true,
+      "description": "处理空字符串查询",
+      "query": ""
+    },
+    {
+      "category": "边界情况",
+      "name": "超长查询",
+      "success": true,
+      "description": "处理超长查询字符串",
+      "query": "查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询查询"
+    },
+    {
+      "category": "边界情况",
+      "name": "特殊字符查询",
+      "success": true,
+      "description": "处理包含特殊字符的查询",
+      "query": "查询@#$%^&*()股票信息"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "migration_time": "2025-06-17",
+  "original_structure": "混合架构",
+  "new_structure": "分离架构",
+  "architectures": {
+    "standard": {
+      "location": "architectures/standard/",
+      "entry_point": "run.py",
+      "status": "已迁移"
+    },
+    "langgraph_native": {
+      "location": "architectures/langgraph_native/",
+      "entry_point": "run.py",
+      "status": "已迁移"
+    }
+  },
+  "shared_components": {
+    "location": "shared/",
+    "components": [
+      "config",
+      "utils",
+      "tools",
+      "data"
+    ]
+  },
+  "backup_location": "original_backup/",
+  "next_steps": [
+    "测试各架构独立运行",
+    "更新CI/CD配置",
+    "更新文档",
+    "验证导入路径"
+  ]
+}

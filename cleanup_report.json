@@ -1,0 +1,53 @@
+{
+  "timestamp": "2025-06-17",
+  "phase": "post_migration_cleanup",
+  "actions": {
+    "deleted_files": [
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/intelligent_tool_selector",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/api",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/adapters",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/deploy",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/main.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/start_backend.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/demo_parallel_execution.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/requirements.txt",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/requirements-api.txt",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/pyproject.toml",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/test_logs",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/test_reports",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/run_youzhi_test.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/youzhi_test.py"
+    ],
+    "moved_files": [
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/advanced_mcp_agent.py → /Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/shared/utils/advanced_mcp_agent.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/intelligent_mcp_caller.py → /Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/shared/utils/intelligent_mcp_caller.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/smart_mcp_caller.py → /Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/shared/utils/smart_mcp_caller.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/mcp_analysis_report.py → /Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/shared/utils/mcp_analysis_report.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/quick_time_test.py → /Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/shared/utils/quick_time_test.py"
+    ],
+    "kept_files": [
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/launch.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/README.md",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/README-NEW-ARCHITECTURE.md",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/migration_report.json",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/check_project_status.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/system_prompt.py",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/uv.lock",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/architectures",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/shared",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/original_backup",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/frontend",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/gstack-langgraph",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/archived_data",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/data",
+      "/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/langraph-stack"
+    ],
+    "errors": []
+  },
+  "statistics": {
+    "files_deleted": 14,
+    "files_moved": 5,
+    "space_saved": 0,
+    "total_actions": 19
+  }
+}
