@@ -16,8 +16,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uvicorn
 
-from adapters import XDANLangGraphAdapter
-from intelligent_tool_selector import MultiTurnToolSelector
+from ..adapters.xdan_langgraph_adapter import XDANLangGraphAdapter
+from ..intelligent_tool_selector import MultiTurnToolSelector
 
 
 # Pydantic 模型定义
