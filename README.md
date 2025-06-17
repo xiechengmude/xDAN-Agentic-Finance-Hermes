@@ -1,108 +1,70 @@
 # xDAN-Agentic-Search-Test
 
-A testing framework for xDAN-Agent-Medium-v2-step300-0525 with agentic capabilities and tool calling through FastMCP.
+## 🏗️ LangGraph Native MCP架构
 
-## Overview
+基于LangGraph原生MCP集成的智能金融助手，支持多轮对话、并行执行和智能工具调用。
 
-This project tests an intelligent agent system that can:
-- Perform intent recognition and task planning
-- Execute multi-turn reasoning with tool integration
-- Handle complex queries like financial analysis
-- Integrate with MCP (Model Context Protocol) servers for tool calling
+### ✨ 核心特性
 
-## Model Configuration
+- 🧠 **LangGraph原生MCP集成**: 使用官方MCP SDK和LangGraph ToolNode
+- 🔄 **多轮智能对话**: 支持复杂查询的智能分解和多轮执行
+- ⚡ **并行执行优化**: 基于依赖分析的智能并行任务执行
+- 🛠️ **138+金融工具**: 涵盖股票、基金、宏观经济等金融数据工具
+- 🌐 **现代Web界面**: React + TypeScript + Tailwind CSS
+- 🐳 **Docker容器化**: 完整的Docker Compose部署方案
 
-- **Model URL**: http://159.54.182.15:8003/v1
-- **Model Name**: xDAN-Agent-Medium-v2-step300-0525
-- **Deployment**: vLLM
+### 🚀 快速开始
 
-## Project Structure
+#### 本地开发
 
-```
-xDAN-Agentic-Search-Test/
-├── README.md
-├── requirements.txt
-├── system_prompt.py      # System prompts for the agent
-├── agent_client.py       # Main client for testing
-└── test_results/         # Test outputs and analysis
+1. **克隆项目**
+```bash
+git clone https://github.com/xiechengmude/xDAN-Agentic-Finance-Hermes.git
+cd xDAN-Agentic-Finance-Hermes
+git checkout graph-web-v2
 ```
 
-## Features
+2. **环境配置**
+```bash
+cp .env.example .env
+# 编辑 .env 文件配置模型和MCP服务器
+```
 
-### System Prompts
-- **Full System Prompt**: Comprehensive instructions for complex reasoning
-- **Compact System Prompt**: Optimized for smaller models with essential instructions
+3. **安装依赖**
+```bash
+# 后端依赖
+pip install -r requirements.txt -r requirements-api.txt
 
-### Agent Capabilities
-- Intent analysis and task decomposition
-- Multi-step reasoning with tool integration
-- Financial data analysis and stock research
-- Web search and information gathering
+# 前端依赖
+cd frontend && npm install && cd ..
+```
 
-### Tool Integration
-- Web search tools
-- Stock market data retrieval
-- Sector performance analysis
-- Extensible MCP server integration
+4. **启动服务**
+```bash
+# 后端 (端口 8000)
+python api/fastapi_app_langgraph_native.py
 
-## Installation
+# 前端 (端口 5173)
+cd frontend && npm run dev
+```
+
+5. **访问应用**
+- 前端界面: http://localhost:5173
+- 后端API: http://localhost:8000
+- API文档: http://localhost:8000/docs
+
+#### Docker部署
 
 ```bash
-cd /Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test
-pip install -r requirements.txt
+# 快速部署
+cd deploy
+docker-compose up -d
+
+# 访问应用
+open http://localhost
 ```
 
-## Usage
-
-### Basic Testing
-```bash
-python agent_client.py
-```
-
-### Custom Query Testing
-```python
-from agent_client import xDANAgentClient
-
-client = xDANAgentClient()
-await client.setup_mcp_tools()
-result = await client.process_user_query("Your query here")
-print(result)
-```
-
-## Test Cases
-
-### 1. Basic Interaction
-- Simple greeting and capability introduction
-- Model response quality assessment
-
-### 2. Complex Financial Query
-**Query**: "帮我查询上周涨幅最大的板块股票是哪些然后逐个分析股票强度和未来的龙头股是什么?"
-
-**Expected Behavior**:
-1. Intent recognition: Financial analysis request
-2. Task planning: Sector analysis → Stock identification → Individual analysis
-3. Tool calling: Sector performance analysis, stock data retrieval
-4. Synthesis: Comprehensive report with recommendations
-
-### 3. Multi-turn Reasoning
-- Complex queries requiring multiple tool calls
-- Context maintenance across iterations
-- Error handling and recovery
-
-## System Prompt Optimization
-
-The system prompts are designed to:
-- Provide clear structure for small model reasoning
-- Enable effective tool calling with proper parameter handling
-- Maintain context across multi-turn conversations
-- Generate actionable insights and recommendations
-
-## Next Steps
-
-1. **Integration Testing**: Connect to actual MCP servers
-2. **Performance Optimization**: Fine-tune prompts based on model responses
-3. **Error Handling**: Improve robustness for edge cases
-4. **Evaluation Metrics**: Implement automated testing and scoring
+详细部署指南请参考: [deploy/README.md](deploy/README.md)
 
 ## 🧠 智能工具选择器系统
 

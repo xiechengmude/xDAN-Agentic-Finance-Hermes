@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # xDAN Backend Service - LangGraph Native MCP Architecture
+  xdan-backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    container_name: xdan-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_BASE_URL=${MODEL_BASE_URL:-http://161.248.3.20:32790/v1}
+      - MODEL_NAME=${MODEL_NAME:-xDAN-Agent-Medium-v2-step300-0525}
+      - MODEL_API_KEY=${MODEL_API_KEY:-dummy_key}
+      - MCP_SERVER_URL=${MCP_SERVER_URL:-http://43.134.62.139:7223/sse}
+      - MAX_ITERATIONS=${MAX_ITERATIONS:-3}
+      - DEFAULT_TEMPERATURE=${DEFAULT_TEMPERATURE:-0.7}
+      - MAX_TOKENS=${MAX_TOKENS:-2048}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - ENABLE_DEBUG=${ENABLE_DEBUG:-false}
+    volumes:
+      - ../data:/app/data
+      - ../tools:/app/tools
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - xdan-network
+
+  # Frontend Service
+  xdan-frontend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.frontend
+    container_name: xdan-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      xdan-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - xdan-network
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: xdan-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - xdan-backend
+      - xdan-frontend
+    restart: unless-stopped
+    networks:
+      - xdan-network
+
+networks:
+  xdan-network:
+    driver: bridge
+
+volumes:
+  xdan-data:
+    driver: local

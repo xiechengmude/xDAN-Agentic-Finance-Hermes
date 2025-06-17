@@ -1,0 +1,42 @@
+# xDAN Backend Dockerfile - LangGraph Native MCP Architecture
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency files
+COPY requirements.txt requirements-api.txt pyproject.toml ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir -r requirements-api.txt \
+    && pip install --no-cache-dir uv
+
+# Copy source code
+COPY adapters/ ./adapters/
+COPY api/ ./api/
+COPY intelligent_tool_selector/ ./intelligent_tool_selector/
+COPY data/ ./data/
+COPY tools/ ./tools/
+COPY .env ./
+COPY main.py system_prompt.py ./
+
+# Create non-root user
+RUN useradd -m -u 1000 xdan && chown -R xdan:xdan /app
+USER xdan
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Start command
+CMD ["python", "api/fastapi_app_langgraph_native.py"]
