@@ -1,4 +1,4 @@
-# xDAN Frontend Dockerfile
+# xDAN Frontend Dockerfile - Development Mode
 FROM node:20-alpine
 
 # Set working directory
@@ -10,24 +10,17 @@ RUN apk add --no-cache curl
 # Copy package files
 COPY frontend/package*.json ./
 
-# Install ALL dependencies (including devDependencies for build)
+# Install dependencies
 RUN npm ci
 
 # Copy source code
 COPY frontend/ ./
 
-# Build the application
-RUN npm run build
-
-# Install serve for serving the built app
-RUN npm install -g serve
-
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S reactjs -u 1001
+    adduser -S reactjs -u 1001 && \
+    chown -R reactjs:nodejs /app
 
-# Change ownership of the app directory
-RUN chown -R reactjs:nodejs /app
 USER reactjs
 
 # Expose port
@@ -37,5 +30,5 @@ EXPOSE 5173
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:5173 || exit 1
 
-# Start command - serve the built application
-CMD ["serve", "-s", "dist", "-l", "5173"]
+# Start development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

@@ -66,10 +66,16 @@ ENABLE_DEBUG=false
 
 ### 3. 启动服务
 
-#### 完整部署（包含Nginx）
+#### 生产环境部署（包含Nginx）
 ```bash
 cd deploy
 docker-compose up -d
+```
+
+#### 开发环境部署（热重载支持）
+```bash
+cd deploy
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
 #### 仅前后端服务
@@ -82,6 +88,8 @@ docker-compose up -d xdan-backend xdan-frontend
 ```bash
 cd deploy
 docker-compose up
+# 或开发环境
+docker-compose -f docker-compose.dev.yml up
 ```
 
 ### 4. 验证部署
@@ -262,7 +270,18 @@ tar czf xdan-config-backup-$(date +%Y%m%d).tar.gz .env deploy/
 
 ### 常见问题
 
-#### 1. 后端启动失败
+#### 1. 前端构建失败
+```bash
+# 错误：tsc: not found 或 Node版本不兼容
+# 解决方案：使用开发环境配置
+cd deploy
+docker-compose -f docker-compose.dev.yml up -d
+
+# 或强制重新构建
+docker-compose build --no-cache xdan-frontend
+```
+
+#### 2. 后端启动失败
 ```bash
 # 检查日志
 docker-compose logs xdan-backend
@@ -271,23 +290,41 @@ docker-compose logs xdan-backend
 # - 环境变量配置错误
 # - MCP服务器连接失败
 # - 模型服务不可用
+# - Python路径问题
+
+# 解决方案：检查环境变量配置
+cat .env
 ```
 
-#### 2. 前端无法访问后端
+#### 3. 前端无法访问后端
 ```bash
 # 检查网络连接
 docker-compose exec xdan-frontend curl http://xdan-backend:8000/health
 
 # 检查端口映射
 docker-compose ps
+
+# 检查代理配置
+docker-compose logs xdan-frontend
 ```
 
-#### 3. 内存不足
+#### 4. 内存不足
 ```bash
 # 查看资源使用
 docker stats
 
 # 增加内存限制或优化配置
+```
+
+#### 5. Node版本兼容性问题
+```bash
+# 如果遇到Node版本警告，可以：
+# 1. 使用开发环境配置（推荐）
+docker-compose -f docker-compose.dev.yml up -d
+
+# 2. 或修改package.json移除版本限制
+# 然后重新构建
+docker-compose build --no-cache
 ```
 
 ### 性能优化

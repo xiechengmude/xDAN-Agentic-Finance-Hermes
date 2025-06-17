@@ -15,8 +15,7 @@ COPY requirements.txt requirements-api.txt pyproject.toml ./
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir -r requirements-api.txt \
-    && pip install --no-cache-dir uv
+    && pip install --no-cache-dir -r requirements-api.txt
 
 # Copy source code
 COPY adapters/ ./adapters/
@@ -24,8 +23,11 @@ COPY api/ ./api/
 COPY intelligent_tool_selector/ ./intelligent_tool_selector/
 COPY data/ ./data/
 COPY tools/ ./tools/
-COPY .env ./
+COPY .env .env.example ./
 COPY main.py system_prompt.py ./
+
+# Set Python path
+ENV PYTHONPATH=/app
 
 # Create non-root user
 RUN useradd -m -u 1000 xdan && chown -R xdan:xdan /app

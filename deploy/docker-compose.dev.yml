@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  # xDAN Backend Service - LangGraph Native MCP Architecture
+  # xDAN Backend Service - Development Mode
   xdan-backend:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.backend
-    container_name: xdan-backend
+    container_name: xdan-backend-dev
     ports:
       - "8000:8000"
     environment:
@@ -17,11 +17,13 @@ services:
       - MAX_ITERATIONS=${MAX_ITERATIONS:-3}
       - DEFAULT_TEMPERATURE=${DEFAULT_TEMPERATURE:-0.7}
       - MAX_TOKENS=${MAX_TOKENS:-2048}
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - ENABLE_DEBUG=${ENABLE_DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-DEBUG}
+      - ENABLE_DEBUG=${ENABLE_DEBUG:-true}
     volumes:
       - ../data:/app/data
       - ../tools:/app/tools
+      - ../adapters:/app/adapters  # Hot reload for development
+      - ../api:/app/api
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -32,16 +34,19 @@ services:
     networks:
       - xdan-network
 
-  # Frontend Service
+  # Frontend Service - Development Mode
   xdan-frontend:
     build:
       context: ..
-      dockerfile: deploy/Dockerfile.frontend
-    container_name: xdan-frontend
+      dockerfile: deploy/Dockerfile.frontend.dev
+    container_name: xdan-frontend-dev
     ports:
       - "5173:5173"
     environment:
       - VITE_API_BASE_URL=http://localhost:8000
+    volumes:
+      - ../frontend/src:/app/src  # Hot reload for development
+      - ../frontend/public:/app/public
     depends_on:
       xdan-backend:
         condition: service_healthy
@@ -50,24 +55,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s  # Increased for build time
-    restart: unless-stopped
-    networks:
-      - xdan-network
-
-  # Nginx Reverse Proxy (Optional)
-  nginx:
-    image: nginx:alpine
-    container_name: xdan-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/ssl
-    depends_on:
-      - xdan-backend
-      - xdan-frontend
+      start_period: 30s
     restart: unless-stopped
     networks:
       - xdan-network
