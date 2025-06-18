@@ -317,8 +317,15 @@ async def stream_chat(request: ChatRequest):
                 }
                 yield f"data: {json.dumps(fallback_event, ensure_ascii=False)}\n\n"
                 
-            # 发送结束信号
-            yield f"data: [DONE]\n\n"
+            # 发送结束信号 - 使用JSON格式
+            done_event = {
+                "event": "done",
+                "data": {
+                    "status": "completed",
+                    "message": "Stream finished"
+                }
+            }
+            yield f"data: {json.dumps(done_event, ensure_ascii=False)}\n\n"
                 
         except Exception as e:
             error_event = {
@@ -583,8 +590,15 @@ async def langgraph_stream_run(assistant_id: str, thread_id: str, request: dict)
                 }
                 yield f"data: {json.dumps(fallback_event, ensure_ascii=False)}\n\n"
                 
-            # 发送结束信号
-            yield f"data: [DONE]\n\n"
+            # 发送结束信号 - 使用JSON格式
+            done_event = {
+                "event": "done",
+                "data": {
+                    "status": "completed",
+                    "message": "Stream finished"
+                }
+            }
+            yield f"data: {json.dumps(done_event, ensure_ascii=False)}\n\n"
                 
         except Exception as e:
             error_event = {
