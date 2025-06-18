@@ -29,7 +29,7 @@ class TestMultiTurnToolSelector(unittest.TestCase):
         """测试初始化"""
         self.selector = MultiTurnToolSelector(
             mcp_server_url="http://43.134.62.139:7223/sse",
-            model_url="http://161.248.3.20:32790/v1",
+            model_url="http://161.248.3.20:21562/v1",
             model_name="xDAN-Agent-Medium-v2-step300-0525"
         )
     

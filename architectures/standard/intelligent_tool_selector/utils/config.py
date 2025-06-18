@@ -14,7 +14,7 @@ class Config:
     MCP_SERVER_URL = "http://43.134.62.139:7223/sse"
     
     # 模型服务器配置
-    MODEL_URL = "http://161.248.3.20:32790/v1"
+    MODEL_URL = "http://161.248.3.20:21562/v1"
     MODEL_NAME = "xDAN-Agent-Medium-v2-step300-0525"
     MODEL_API_KEY = "dummy-key"
     
