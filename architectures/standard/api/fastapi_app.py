@@ -16,8 +16,18 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uvicorn
 
-from ..adapters.xdan_langgraph_adapter import XDANLangGraphAdapter
-from ..intelligent_tool_selector import MultiTurnToolSelector
+import sys
+from pathlib import Path
+
+# 添加模块路径到sys.path
+current_dir = Path(__file__).parent
+standard_dir = current_dir.parent
+project_root = standard_dir.parent.parent
+sys.path.insert(0, str(standard_dir))
+sys.path.insert(0, str(project_root / "shared"))
+
+from adapters.xdan_langgraph_adapter import XDANLangGraphAdapter
+from intelligent_tool_selector import MultiTurnToolSelector
 
 
 # Pydantic 模型定义
@@ -26,16 +36,19 @@ class Message(BaseModel):
     content: str
     id: Optional[str] = None
 
+
 class RunRequest(BaseModel):
     messages: List[Message]
     initial_search_query_count: Optional[int] = 3
     max_research_loops: Optional[int] = 5
     reasoning_model: Optional[str] = None
 
+
 class ThreadResponse(BaseModel):
     thread_id: str
     status: str
     created_at: str
+
 
 class HealthResponse(BaseModel):
     status: str
@@ -48,7 +61,7 @@ class HealthResponse(BaseModel):
 app = FastAPI(
     title="xDAN-LangGraph Adapter API",
     description="适配器API，将xDAN后端转换为LangGraph兼容接口",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # CORS配置
@@ -88,6 +101,7 @@ async def startup_event():
 
 # API 路由定义
 
+
 @app.get("/")
 async def root():
     """根路径"""
@@ -95,7 +109,7 @@ async def root():
         "name": "xDAN-LangGraph Adapter API",
         "version": "1.0.0",
         "status": "running",
-        "docs": "/docs"
+        "docs": "/docs",
     }
 
 
@@ -111,7 +125,7 @@ async def health_check():
             status="unhealthy",
             initialized=False,
             tools_available=0,
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
         )
 
 
@@ -120,24 +134,24 @@ async def create_thread(assistant_id: str):
     """创建新线程"""
     adapter_instance = await get_adapter()
     thread_id = await adapter_instance.create_thread()
-    
+
     return ThreadResponse(
-        thread_id=thread_id,
-        status="created",
-        created_at=datetime.now().isoformat()
+        thread_id=thread_id, status="created", created_at=datetime.now().isoformat()
     )
 
 
-@app.get("/assistants/{assistant_id}/threads/{thread_id}", response_model=ThreadResponse)
+@app.get(
+    "/assistants/{assistant_id}/threads/{thread_id}", response_model=ThreadResponse
+)
 async def get_thread(assistant_id: str, thread_id: str):
     """获取线程信息"""
     adapter_instance = await get_adapter()
     thread_info = await adapter_instance.get_thread_status(thread_id)
-    
+
     return ThreadResponse(
         thread_id=thread_id,
         status=thread_info.get("status", "active"),
-        created_at=thread_info.get("created_at", datetime.now().isoformat())
+        created_at=thread_info.get("created_at", datetime.now().isoformat()),
     )
 
 
@@ -146,46 +160,46 @@ async def stream_run(assistant_id: str, thread_id: str, request: RunRequest):
     """流式执行接口（兼容LangGraph SDK）"""
     try:
         adapter_instance = await get_adapter()
-        
+
         # 转换消息格式
         messages = [msg.dict() for msg in request.messages]
         config = {
             "initial_search_query_count": request.initial_search_query_count,
             "max_research_loops": request.max_research_loops,
-            "reasoning_model": request.reasoning_model
+            "reasoning_model": request.reasoning_model,
         }
-        
+
         print(f"📡 开始流式执行 - Thread: {thread_id}, Assistant: {assistant_id}")
-        
+
         async def event_generator():
             """SSE事件生成器"""
             try:
                 # 发送开始事件
                 yield f"data: {json.dumps({'type': 'start', 'timestamp': datetime.now().isoformat()})}\n\n"
-                
+
                 # 流式执行并发送事件
                 async for event in adapter_instance.stream_execution(messages, config):
                     event_data = {
                         "type": "update",
                         "data": event,
-                        "timestamp": datetime.now().isoformat()
+                        "timestamp": datetime.now().isoformat(),
                     }
                     yield f"data: {json.dumps(event_data)}\n\n"
-                    
+
                     # 控制发送速度
                     await asyncio.sleep(0.1)
-                
+
                 # 发送结束事件
                 yield f"data: {json.dumps({'type': 'end', 'timestamp': datetime.now().isoformat()})}\n\n"
-                
+
             except Exception as e:
                 error_event = {
                     "type": "error",
                     "error": str(e),
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
                 }
                 yield f"data: {json.dumps(error_event)}\n\n"
-        
+
         return StreamingResponse(
             event_generator(),
             media_type="text/event-stream",
@@ -194,9 +208,9 @@ async def stream_run(assistant_id: str, thread_id: str, request: RunRequest):
                 "Connection": "keep-alive",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
-            }
+            },
         )
-        
+
     except Exception as e:
         print(f"❌ 流式执行错误: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -207,15 +221,15 @@ async def get_thread_history(assistant_id: str, thread_id: str, request: dict):
     """获取线程历史记录（兼容LangGraph SDK）"""
     try:
         adapter_instance = await get_adapter()
-        
+
         # For now, return an empty history since our current implementation
         # doesn't maintain detailed state history like LangGraph Studio
         # In a full implementation, this would return the actual thread history
         history = []
-        
+
         print(f"📜 获取线程历史 - Thread: {thread_id}, Assistant: {assistant_id}")
         return history
-        
+
     except Exception as e:
         print(f"❌ 获取线程历史错误: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -227,21 +241,18 @@ async def get_thread_state(assistant_id: str, thread_id: str):
     try:
         adapter_instance = await get_adapter()
         thread_info = await adapter_instance.get_thread_status(thread_id)
-        
+
         # Return a minimal state structure that LangGraph SDK expects
         state = {
             "values": thread_info.get("values", {}),
-            "checkpoint": {
-                "checkpoint_id": thread_id,
-                "thread_id": thread_id
-            },
+            "checkpoint": {"checkpoint_id": thread_id, "thread_id": thread_id},
             "created_at": thread_info.get("created_at", datetime.now().isoformat()),
-            "metadata": thread_info.get("metadata", {})
+            "metadata": thread_info.get("metadata", {}),
         }
-        
+
         print(f"📊 获取线程状态 - Thread: {thread_id}, Assistant: {assistant_id}")
         return state
-        
+
     except Exception as e:
         print(f"❌ 获取线程状态错误: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -252,56 +263,57 @@ async def websocket_stream(websocket: WebSocket):
     """WebSocket流式接口"""
     await websocket.accept()
     print("🔌 WebSocket 连接已建立")
-    
+
     try:
         adapter_instance = await get_adapter()
-        
+
         while True:
             # 接收客户端消息
             data = await websocket.receive_json()
             print(f"📨 收到WebSocket消息: {data.get('type', 'unknown')}")
-            
+
             if data.get("type") == "run":
                 messages = data.get("messages", [])
                 config = data.get("config", {})
-                
+
                 # 发送开始事件
-                await websocket.send_json({
-                    "type": "start",
-                    "timestamp": datetime.now().isoformat()
-                })
-                
+                await websocket.send_json(
+                    {"type": "start", "timestamp": datetime.now().isoformat()}
+                )
+
                 # 流式执行并发送事件
                 try:
-                    async for event in adapter_instance.stream_execution(messages, config):
-                        await websocket.send_json({
-                            "type": "update",
-                            "data": event,
-                            "timestamp": datetime.now().isoformat()
-                        })
+                    async for event in adapter_instance.stream_execution(
+                        messages, config
+                    ):
+                        await websocket.send_json(
+                            {
+                                "type": "update",
+                                "data": event,
+                                "timestamp": datetime.now().isoformat(),
+                            }
+                        )
                         await asyncio.sleep(0.1)
-                    
+
                     # 发送完成事件
-                    await websocket.send_json({
-                        "type": "complete",
-                        "timestamp": datetime.now().isoformat()
-                    })
-                    
+                    await websocket.send_json(
+                        {"type": "complete", "timestamp": datetime.now().isoformat()}
+                    )
+
                 except Exception as e:
-                    await websocket.send_json({
-                        "type": "error",
-                        "error": str(e),
-                        "timestamp": datetime.now().isoformat()
-                    })
-            
+                    await websocket.send_json(
+                        {
+                            "type": "error",
+                            "error": str(e),
+                            "timestamp": datetime.now().isoformat(),
+                        }
+                    )
+
     except WebSocketDisconnect:
         print("🔌 WebSocket 连接已断开")
     except Exception as e:
         print(f"❌ WebSocket 错误: {e}")
-        await websocket.send_json({
-            "type": "error",
-            "error": str(e)
-        })
+        await websocket.send_json({"type": "error", "error": str(e)})
 
 
 @app.get("/tools/count")
@@ -322,7 +334,9 @@ async def list_tools():
         adapter_instance = await get_adapter()
         if adapter_instance.is_initialized:
             # 获取工具信息
-            tools_info = adapter_instance.xdan_selector.single_turn_selector.mcp_manager.get_all_tools_info()
+            tools_info = (
+                adapter_instance.xdan_selector.single_turn_selector.mcp_manager.get_all_tools_info()
+            )
             return {"tools": list(tools_info.keys()), "total": len(tools_info)}
         else:
             return {"tools": [], "total": 0}
@@ -349,11 +363,7 @@ if __name__ == "__main__":
     print("🚀 启动 xDAN-LangGraph Adapter API 服务器...")
     print("📡 API 文档: http://localhost:8000/docs")
     print("🔍 健康检查: http://localhost:8000/health")
-    
+
     uvicorn.run(
-        "fastapi_app:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
+        "fastapi_app:app", host="0.0.0.0", port=8000, reload=True, log_level="info"
     )

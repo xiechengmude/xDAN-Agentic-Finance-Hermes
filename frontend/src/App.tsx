@@ -1,9 +1,167 @@
-import { useStream } from "@langchain/langgraph-sdk/react";
-import type { Message } from "@langchain/langgraph-sdk";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ProcessedEvent } from "@/components/ActivityTimeline";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { ChatMessagesView } from "@/components/ChatMessagesView";
+
+// 消息类型定义
+interface Message {
+  id: string;
+  type: "human" | "ai";
+  content: string;
+}
+
+// 流式处理的自定义Hook
+function useCustomStream() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  /**
+   * 提交新消息并开始流式处理
+   */
+  const submit = useCallback(
+    async (data: {
+      messages: Message[];
+      initial_search_query_count?: number;
+      max_research_loops?: number;
+      reasoning_model?: string;
+    }) => {
+      if (isLoading) return;
+
+      setIsLoading(true);
+      abortControllerRef.current = new AbortController();
+
+      try {
+        // 1. 创建新线程
+        const threadResponse = await fetch(
+          "http://localhost:8000/assistants/xdan-agent/threads",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: abortControllerRef.current.signal,
+          }
+        );
+
+        if (!threadResponse.ok) {
+          throw new Error(`创建线程失败: ${threadResponse.status}`);
+        }
+
+        const { thread_id } = await threadResponse.json();
+
+        // 2. 发送流式请求
+        const streamResponse = await fetch(
+          `http://localhost:8000/assistants/xdan-agent/threads/${thread_id}/runs/stream`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: data.messages.map((msg) => ({
+                type: msg.type,
+                content: msg.content,
+                id: msg.id,
+              })),
+              initial_search_query_count: data.initial_search_query_count || 3,
+              max_research_loops: data.max_research_loops || 5,
+              reasoning_model: data.reasoning_model,
+            }),
+            signal: abortControllerRef.current.signal,
+          }
+        );
+
+        if (!streamResponse.ok) {
+          throw new Error(`流式请求失败: ${streamResponse.status}`);
+        }
+
+        // 3. 处理SSE流
+        const reader = streamResponse.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let aiMessage = "";
+        let currentMessageId = Date.now().toString();
+
+        // 立即添加用户消息
+        setMessages((prev) => [...prev, ...data.messages]);
+
+        if (reader) {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                try {
+                  const eventData = JSON.parse(line.slice(6));
+
+                  if (eventData.type === "update" && eventData.data) {
+                    // 处理不同类型的事件
+                    if (eventData.data.finalize_answer) {
+                      aiMessage =
+                        eventData.data.finalize_answer.response || "分析完成";
+                    } else if (eventData.data.web_research) {
+                      // 可以在这里处理中间状态更新
+                    }
+                  }
+                } catch (e) {
+                  console.warn("Failed to parse SSE data:", line);
+                }
+              }
+            }
+          }
+
+          // 添加AI响应消息
+          if (aiMessage) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: currentMessageId,
+                type: "ai" as const,
+                content: aiMessage,
+              },
+            ]);
+          }
+        }
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          console.error("Stream error:", error);
+          // 添加错误消息
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              type: "ai" as const,
+              content: `抱歉，处理您的请求时出现错误：${error.message}`,
+            },
+          ]);
+        }
+      } finally {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+      }
+    },
+    [isLoading]
+  );
+
+  /**
+   * 停止当前的流式处理
+   */
+  const stop = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsLoading(false);
+    }
+  }, []);
+
+  return {
+    messages,
+    isLoading,
+    submit,
+    stop,
+  };
+}
 
 export default function App() {
   const [processedEventsTimeline, setProcessedEventsTimeline] = useState<
@@ -13,68 +171,9 @@ export default function App() {
     Record<string, ProcessedEvent[]>
   >({});
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const hasFinalizeEventOccurredRef = useRef(false);
 
-  const thread = useStream<{
-    messages: Message[];
-    initial_search_query_count: number;
-    max_research_loops: number;
-    reasoning_model: string;
-  }>({
-    apiUrl: "http://localhost:5173",
-    assistantId: "xdan-agent",
-    messagesKey: "messages",
-    onFinish: (event: any) => {
-      console.log(event);
-    },
-    onUpdateEvent: (event: any) => {
-      let processedEvent: ProcessedEvent | null = null;
-      
-      // 处理嵌套的事件数据
-      const eventData = event.data || event;
-      
-      if (eventData.generate_query) {
-        processedEvent = {
-          title: "🧠 智能分析查询",
-          data: eventData.generate_query.query_list.join(", "),
-        };
-      } else if (eventData.web_research) {
-        const sources = eventData.web_research.sources_gathered || [];
-        const numSources = sources.length;
-        const uniqueLabels = [
-          ...new Set(sources.map((s: any) => s.label).filter(Boolean)),
-        ];
-        const exampleLabels = uniqueLabels.slice(0, 3).join(", ");
-        processedEvent = {
-          title: "🔧 工具执行",
-          data: `已获取 ${numSources} 个数据源。来源: ${
-            exampleLabels || "N/A"
-          }`,
-        };
-      } else if (eventData.reflection) {
-        processedEvent = {
-          title: "🤔 结果分析",
-          data: eventData.reflection.is_sufficient
-            ? "数据获取成功，正在生成综合分析。"
-            : `需要更多信息: ${eventData.reflection.follow_up_queries?.join(
-                ", "
-              ) || "补充数据查询"}`,
-        };
-      } else if (eventData.finalize_answer) {
-        processedEvent = {
-          title: "📊 生成最终报告",
-          data: "正在整合分析结果并生成专业报告。",
-        };
-        hasFinalizeEventOccurredRef.current = true;
-      }
-      if (processedEvent) {
-        setProcessedEventsTimeline((prevEvents) => [
-          ...prevEvents,
-          processedEvent!,
-        ]);
-      }
-    },
-  });
+  // 使用自定义的流式处理Hook
+  const thread = useCustomStream();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -87,33 +186,12 @@ export default function App() {
     }
   }, [thread.messages]);
 
-  useEffect(() => {
-    if (
-      hasFinalizeEventOccurredRef.current &&
-      !thread.isLoading &&
-      thread.messages.length > 0
-    ) {
-      const lastMessage = thread.messages[thread.messages.length - 1];
-      if (lastMessage && lastMessage.type === "ai" && lastMessage.id) {
-        setHistoricalActivities((prev) => ({
-          ...prev,
-          [lastMessage.id!]: [...processedEventsTimeline],
-        }));
-      }
-      hasFinalizeEventOccurredRef.current = false;
-    }
-  }, [thread.messages, thread.isLoading, processedEventsTimeline]);
-
   const handleSubmit = useCallback(
     (submittedInputValue: string, effort: string, model: string) => {
       if (!submittedInputValue.trim()) return;
       setProcessedEventsTimeline([]);
-      hasFinalizeEventOccurredRef.current = false;
 
-      // convert effort to, initial_search_query_count and max_research_loops
-      // low means max 1 loop and 1 query
-      // medium means max 3 loops and 3 queries
-      // high means max 10 loops and 5 queries
+      // 转换effort参数
       let initial_search_query_count = 0;
       let max_research_loops = 0;
       switch (effort) {
@@ -131,18 +209,16 @@ export default function App() {
           break;
       }
 
-      const newMessages: Message[] = [
-        ...(thread.messages || []),
-        {
-          type: "human",
-          content: submittedInputValue,
-          id: Date.now().toString(),
-        },
-      ];
+      const newMessage: Message = {
+        type: "human",
+        content: submittedInputValue,
+        id: Date.now().toString(),
+      };
+
       thread.submit({
-        messages: newMessages,
-        initial_search_query_count: initial_search_query_count,
-        max_research_loops: max_research_loops,
+        messages: [newMessage],
+        initial_search_query_count,
+        max_research_loops,
         reasoning_model: model,
       });
     },
