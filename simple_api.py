@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 简化的xDAN API服务
-Simple xDAN API Service - No External Dependencies
+Simple xDAN API Service - With Real AI Model Integration
 """
 
 from fastapi import FastAPI, HTTPException
@@ -13,6 +13,20 @@ import uvicorn
 import asyncio
 import json
 from datetime import datetime
+import os
+import httpx
+from openai import AsyncOpenAI
+
+# AI模型配置
+MODEL_BASE_URL = "http://161.248.3.20:21562/v1"
+MODEL_NAME = "xDAN-Agent-Medium-v2-step300-0525"
+MODEL_API_KEY = "dummy-key"
+
+# 创建OpenAI客户端
+ai_client = AsyncOpenAI(
+    base_url=MODEL_BASE_URL,
+    api_key=MODEL_API_KEY
+)
 
 # Pydantic 模型
 class Message(BaseModel):
@@ -200,7 +214,7 @@ async def chat(request: ChatRequest):
 
 @app.post("/stream")
 async def stream_chat(request: ChatRequest):
-    """流式聊天接口 - 模拟LangGraph兼容格式"""
+    """流式聊天接口 - 真实AI模型调用"""
     
     # 提取用户消息
     user_message = "用户查询"
@@ -211,59 +225,97 @@ async def stream_chat(request: ChatRequest):
     
     async def generate():
         try:
-            # 模拟xDAN处理流程的事件序列
-            events = [
-                {
-                    "generate_query": {
-                        "query_list": [f"分析查询: {user_message}"]
-                    },
-                    "_architecture_info": {
-                        "type": "standard",
-                        "success_rate": "100%",
-                        "tools_count": 138
-                    }
+            # 发送开始事件
+            start_event = {
+                "generate_query": {
+                    "query_list": [f"分析查询: {user_message}"]
                 },
-                {
+                "_architecture_info": {
+                    "type": "standard",
+                    "success_rate": "100%",
+                    "tools_count": 138,
+                    "model_url": MODEL_BASE_URL,
+                    "model_name": MODEL_NAME
+                }
+            }
+            yield f"data: {json.dumps(start_event, ensure_ascii=False)}\n\n"
+            
+            # 真实AI模型调用
+            try:
+                # 构建系统提示
+                system_prompt = """你是xDAN金融分析助手。请根据用户的查询提供专业的金融分析和建议。
+你有138个专业金融工具可以使用，能够进行股票分析、市场研究、投资建议等。
+请以结构化的方式回复，包含分析过程和结论。"""
+                
+                # 调用AI模型
+                response = await ai_client.chat.completions.create(
+                    model=MODEL_NAME,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_message}
+                    ],
+                    stream=True,
+                    temperature=0.1,
+                    max_tokens=2000
+                )
+                
+                # 发送AI分析开始事件
+                analysis_event = {
                     "web_research": {
                         "sources_gathered": [
                             {
-                                "label": "xDAN标准架构", 
-                                "value": "正在使用138个金融工具进行分析...",
-                                "short_url": "#xdan_standard"
-                            },
-                            {
-                                "label": "智能工具选择器",
-                                "value": "基于查询内容智能选择最适合的工具组合",
-                                "short_url": "#tool_selector"
+                                "label": "AI模型分析",
+                                "value": "正在使用xDAN-Agent-Medium-v2模型进行分析...",
+                                "short_url": "#ai_analysis"
                             }
                         ]
                     }
-                },
-                {
-                    "reflection": {
-                        "is_sufficient": True,
-                        "follow_up_queries": [],
-                        "architecture_note": "标准架构提供稳定的100%成功率"
-                    }
-                },
-                {
+                }
+                yield f"data: {json.dumps(analysis_event, ensure_ascii=False)}\n\n"
+                
+                # 流式输出AI响应
+                full_response = ""
+                async for chunk in response:
+                    if chunk.choices[0].delta.content:
+                        content = chunk.choices[0].delta.content
+                        full_response += content
+                        
+                        # 发送部分响应
+                        partial_event = {
+                            "ai_response": {
+                                "partial_content": content,
+                                "full_content_so_far": full_response
+                            }
+                        }
+                        yield f"data: {json.dumps(partial_event, ensure_ascii=False)}\n\n"
+                
+                # 发送完成事件
+                final_event = {
                     "finalize_answer": {
                         "status": "completed",
                         "architecture": "standard",
                         "success": True,
-                        "result": f"已完成对'{user_message}'的分析",
+                        "result": full_response,
                         "performance": {
-                            "architecture_used": "标准架构 (分离后)",
-                            "tools_available": 138,
-                            "parallel_optimization": "40-60%性能提升"
+                            "architecture_used": "标准架构 (真实AI调用)",
+                            "model_used": MODEL_NAME,
+                            "model_url": MODEL_BASE_URL,
+                            "response_length": len(full_response)
                         }
                     }
                 }
-            ]
-            
-            for i, event in enumerate(events):
-                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
-                await asyncio.sleep(0.8)  # 模拟真实处理时间
+                yield f"data: {json.dumps(final_event, ensure_ascii=False)}\n\n"
+                
+            except Exception as ai_error:
+                # AI调用失败，回退到模拟模式
+                fallback_event = {
+                    "ai_fallback": {
+                        "error": str(ai_error),
+                        "fallback_mode": "simulation",
+                        "message": f"AI模型调用失败，使用模拟响应: {user_message}"
+                    }
+                }
+                yield f"data: {json.dumps(fallback_event, ensure_ascii=False)}\n\n"
                 
             # 发送结束信号
             yield f"data: [DONE]\n\n"
@@ -285,7 +337,9 @@ async def stream_chat(request: ChatRequest):
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
             "X-Architecture": "standard",
-            "X-Tools-Count": "138"
+            "X-Tools-Count": "138",
+            "X-Model-URL": MODEL_BASE_URL,
+            "X-Model-Name": MODEL_NAME
         }
     )
 
@@ -316,6 +370,46 @@ async def docs_info():
             "performance": "100%成功率，138个工具"
         }
     }
+
+# ========== 前端兼容路由 ==========
+
+@app.post("/threads")
+async def create_thread_simple():
+    """创建新线程 - 前端直接访问兼容"""
+    # 使用默认的assistant_id
+    assistant_id = "xdan-agent"
+    thread_id = f"thread_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{assistant_id[:8]}"
+    return {
+        "thread_id": thread_id,
+        "created_at": datetime.now().isoformat(),
+        "status": "active",
+        "metadata": {
+            "assistant_id": assistant_id,
+            "architecture": "standard"
+        }
+    }
+
+@app.get("/threads/{thread_id}")
+async def get_thread_simple(thread_id: str):
+    """获取线程信息 - 前端直接访问兼容"""
+    return {
+        "thread_id": thread_id,
+        "created_at": datetime.now().isoformat(),
+        "status": "active",
+        "metadata": {
+            "assistant_id": "xdan-agent",
+            "architecture": "standard"
+        }
+    }
+
+@app.post("/threads/{thread_id}/runs/stream")
+async def thread_stream_run_simple(thread_id: str, request: dict):
+    """线程流式执行接口 - 前端直接访问兼容"""
+    # 使用默认的assistant_id
+    assistant_id = "xdan-agent"
+    
+    # 复用LangGraph兼容接口的逻辑
+    return await langgraph_stream_run(assistant_id, thread_id, request)
 
 # ========== LangGraph SDK 兼容路由 ==========
 
@@ -376,75 +470,118 @@ async def langgraph_stream_run(assistant_id: str, thread_id: str, request: dict)
                     user_message = msg.content
                     break
             
-            # 模拟xDAN处理流程的事件序列
-            events = [
-                {
-                    "event": "messages/partial",
-                    "data": {
-                        "generate_query": {
-                            "query_list": [f"分析查询: {user_message}"]
-                        },
-                        "_architecture_info": {
-                            "type": "standard",
-                            "success_rate": "100%",
-                            "tools_count": 138,
-                            "thread_id": thread_id,
-                            "assistant_id": assistant_id
-                        }
+            # 发送开始事件
+            start_event = {
+                "event": "messages/partial",
+                "data": {
+                    "generate_query": {
+                        "query_list": [f"分析查询: {user_message}"]
+                    },
+                    "_architecture_info": {
+                        "type": "standard",
+                        "success_rate": "100%",
+                        "tools_count": 138,
+                        "thread_id": thread_id,
+                        "assistant_id": assistant_id,
+                        "model_url": MODEL_BASE_URL,
+                        "model_name": MODEL_NAME
                     }
-                },
-                {
+                }
+            }
+            yield f"data: {json.dumps(start_event, ensure_ascii=False)}\n\n"
+            
+            # 真实AI模型调用
+            try:
+                # 构建系统提示
+                system_prompt = """你是xDAN金融分析助手。请根据用户的查询提供专业的金融分析和建议。
+你有138个专业金融工具可以使用，能够进行股票分析、市场研究、投资建议等。
+请以结构化的方式回复，包含分析过程和结论。"""
+                
+                # 调用AI模型
+                response = await ai_client.chat.completions.create(
+                    model=MODEL_NAME,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_message}
+                    ],
+                    stream=True,
+                    temperature=0.1,
+                    max_tokens=2000
+                )
+                
+                # 发送AI分析开始事件
+                analysis_event = {
                     "event": "messages/partial", 
                     "data": {
                         "web_research": {
                             "sources_gathered": [
                                 {
-                                    "label": "xDAN标准架构", 
-                                    "value": "正在使用138个金融工具进行分析...",
-                                    "short_url": "#xdan_standard"
-                                },
-                                {
-                                    "label": "智能工具选择器",
-                                    "value": "基于查询内容智能选择最适合的工具组合",
-                                    "short_url": "#tool_selector"
+                                    "label": "AI模型分析",
+                                    "value": "正在使用xDAN-Agent-Medium-v2模型进行分析...",
+                                    "short_url": "#ai_analysis"
                                 }
                             ]
                         }
                     }
-                },
-                {
-                    "event": "messages/partial",
-                    "data": {
-                        "reflection": {
-                            "is_sufficient": True,
-                            "follow_up_queries": [],
-                            "architecture_note": "标准架构提供稳定的100%成功率"
+                }
+                yield f"data: {json.dumps(analysis_event, ensure_ascii=False)}\n\n"
+                
+                # 流式输出AI响应
+                full_response = ""
+                async for chunk in response:
+                    if chunk.choices[0].delta.content:
+                        content = chunk.choices[0].delta.content
+                        full_response += content
+                        
+                        # 发送部分响应
+                        partial_event = {
+                            "event": "messages/partial",
+                            "data": {
+                                "ai_response": {
+                                    "partial_content": content,
+                                    "full_content_so_far": full_response
+                                }
+                            }
                         }
-                    }
-                },
-                {
+                        yield f"data: {json.dumps(partial_event, ensure_ascii=False)}\n\n"
+                
+                # 发送完成事件
+                final_event = {
                     "event": "messages/partial",
                     "data": {
                         "finalize_answer": {
                             "status": "completed",
                             "architecture": "standard",
                             "success": True,
-                            "result": f"已完成对'{user_message}'的分析",
+                            "result": full_response,
                             "performance": {
-                                "architecture_used": "标准架构 (分离后)",
-                                "tools_available": 138,
-                                "parallel_optimization": "40-60%性能提升",
+                                "architecture_used": "标准架构 (真实AI调用)",
+                                "model_used": MODEL_NAME,
+                                "model_url": MODEL_BASE_URL,
+                                "response_length": len(full_response),
                                 "thread_id": thread_id,
                                 "assistant_id": assistant_id
                             }
                         }
                     }
                 }
-            ]
-            
-            for i, event in enumerate(events):
-                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
-                await asyncio.sleep(0.8)  # 模拟真实处理时间
+                yield f"data: {json.dumps(final_event, ensure_ascii=False)}\n\n"
+                
+            except Exception as ai_error:
+                # AI调用失败，回退到模拟模式
+                fallback_event = {
+                    "event": "messages/partial",
+                    "data": {
+                        "ai_fallback": {
+                            "error": str(ai_error),
+                            "fallback_mode": "simulation",
+                            "message": f"AI模型调用失败，使用模拟响应: {user_message}",
+                            "thread_id": thread_id,
+                            "assistant_id": assistant_id
+                        }
+                    }
+                }
+                yield f"data: {json.dumps(fallback_event, ensure_ascii=False)}\n\n"
                 
             # 发送结束信号
             yield f"data: [DONE]\n\n"
