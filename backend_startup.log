@@ -1,0 +1,19 @@
+/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/architectures/standard/api/fastapi_app.py:95: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  return self.router.on_event(event_type)
+INFO:     Will watch for changes in these directories: ['/Users/gump_m2/CascadeProjects/xDAN-Agentic-Search-Test']
+ERROR:    [Errno 48] Address already in use
+🚀 启动 xDAN-LangGraph Adapter API 服务器...
+📡 API 文档: http://localhost:8000/docs
+🔍 健康检查: http://localhost:8000/health

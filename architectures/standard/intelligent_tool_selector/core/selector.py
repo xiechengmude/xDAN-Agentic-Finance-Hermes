@@ -12,6 +12,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from ..utils.config import Config
 from ..utils.mcp_client import MCPClientManager
 from .json_parser import JSONParser
+from ..utils.langfuse_integration import trace_async, log_generation, langfuse_integration
 
 
 class IntelligentToolSelector:
@@ -72,6 +73,7 @@ class IntelligentToolSelector:
             print("❌ 无法加载MCP工具")
         return success
     
+    @trace_async(name="select_and_execute_tool")
     async def select_and_execute_tool(self, user_query: str) -> Dict[str, Any]:
         """
         智能选择并执行工具

@@ -1,0 +1,134 @@
+INFO:     Started server process [60200]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8003 (Press CTRL+C to quit)
+🚀 启动xDAN简化API服务...
+==================================================
+📋 服务信息:
+   - 名称: xDAN Simple API
+   - 版本: 2.0.0 (架构分离版)
+   - 端口: 8003
+   - 架构: 标准架构 (分离后)
+
+🌐 访问地址:
+   - 服务首页: http://localhost:8003/
+   - 健康检查: http://localhost:8003/health
+   - API文档: http://localhost:8003/docs
+   - 架构状态: http://localhost:8003/architectures/status
+
+📋 可用接口:
+   - POST /chat - 单次聊天
+   - POST /stream - 流式聊天 (LangGraph兼容)
+   - GET /docs-info - API文档说明
+
+✅ 服务不依赖外部MCP服务器，可独立运行
+==================================================
+INFO:     192.168.31.110:49344 - "OPTIONS //health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49345 - "GET //health HTTP/1.1" 404 Not Found
+INFO:     192.168.31.110:49345 - "OPTIONS //health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49352 - "GET //health HTTP/1.1" 404 Not Found
+INFO:     192.168.31.110:49352 - "OPTIONS //health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49359 - "GET //health HTTP/1.1" 404 Not Found
+INFO:     192.168.31.110:49359 - "OPTIONS //health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49360 - "GET //health HTTP/1.1" 404 Not Found
+INFO:     192.168.31.110:49360 - "OPTIONS //health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49365 - "GET //health HTTP/1.1" 404 Not Found
+INFO:     192.168.31.110:49525 - "OPTIONS /health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49526 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49526 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49549 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49549 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_141220_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:49550 - "POST /assistants/xdan-agent/threads/thread_20250618_141220_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50985 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50986 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50986 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_141552_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50987 - "POST /assistants/xdan-agent/threads/thread_20250618_141552_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52352 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52357 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52357 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_141903_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52358 - "POST /assistants/xdan-agent/threads/thread_20250618_141903_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:57286 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:57287 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:57287 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_143019_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:57288 - "POST /assistants/xdan-agent/threads/thread_20250618_143019_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:59952 - "OPTIONS /health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:59953 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:60028 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:60029 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:60029 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_143613_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:60032 - "POST /assistants/xdan-agent/threads/thread_20250618_143613_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50198 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50199 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50199 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_145108_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50200 - "POST /assistants/xdan-agent/threads/thread_20250618_145108_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50413 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50414 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50414 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_145134_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50415 - "POST /assistants/xdan-agent/threads/thread_20250618_145134_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50492 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50495 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50495 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_145146_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50496 - "POST /assistants/xdan-agent/threads/thread_20250618_145146_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50587 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50588 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50588 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_145202_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:50589 - "POST /assistants/xdan-agent/threads/thread_20250618_145202_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52525 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52526 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52526 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_145613_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52527 - "POST /assistants/xdan-agent/threads/thread_20250618_145613_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52975 - "OPTIONS /health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:52976 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53013 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53013 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_145827_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53014 - "POST /assistants/xdan-agent/threads/thread_20250618_145827_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53648 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53648 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_150224_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53649 - "POST /assistants/xdan-agent/threads/thread_20250618_150224_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53686 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53686 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_150253_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53687 - "POST /assistants/xdan-agent/threads/thread_20250618_150253_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53749 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53756 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53756 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_150312_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:53757 - "POST /assistants/xdan-agent/threads/thread_20250618_150312_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:55483 - "GET /docs HTTP/1.1" 200 OK
+INFO:     192.168.31.110:55483 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     192.168.31.110:56158 - "OPTIONS /health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:56159 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.31.110:56202 - "OPTIONS /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:56203 - "POST /assistants/xdan-agent/threads HTTP/1.1" 200 OK
+INFO:     192.168.31.110:56203 - "OPTIONS /assistants/xdan-agent/threads/thread_20250618_150844_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:56208 - "POST /assistants/xdan-agent/threads/thread_20250618_150844_xdan-age/runs/stream HTTP/1.1" 200 OK
+INFO:     192.168.31.110:59108 - "POST /stream HTTP/1.1" 200 OK
+INFO:     Started server process [62501]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 8003): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+🚀 启动xDAN简化API服务...
+==================================================
+📋 服务信息:
+   - 名称: xDAN Simple API
+   - 版本: 2.0.0 (架构分离版)
+   - 端口: 8003
+   - 架构: 标准架构 (分离后)
+
+🌐 访问地址:
+   - 服务首页: http://localhost:8003/
+   - 健康检查: http://localhost:8003/health
+   - API文档: http://localhost:8003/docs
+   - 架构状态: http://localhost:8003/architectures/status
+
+📋 可用接口:
+   - POST /chat - 单次聊天
+   - POST /stream - 流式聊天 (LangGraph兼容)
+   - GET /docs-info - API文档说明
+
+✅ 服务不依赖外部MCP服务器，可独立运行
+==================================================
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [60200]

@@ -165,13 +165,116 @@ class EventMapper:
         Returns:
             LangGraph格式的finalize_answer事件
         """
+        # 提取实际的回答内容
+        response_content = ""
+        
+        if final_result.get('success'):
+            # 多轮模式的结果
+            if 'integrated_analysis' in final_result:
+                response_content = final_result['integrated_analysis']
+            # 单轮模式的结果
+            elif 'execution_result' in final_result:
+                execution_result = final_result['execution_result']
+                tool_response = execution_result.get('response', {})
+                
+                # 格式化工具响应为用户友好的回答
+                if isinstance(tool_response, dict):
+                    # 如果是字典，尝试提取关键信息
+                    if 'data' in tool_response:
+                        response_content = self._format_tool_response(tool_response['data'])
+                    elif 'result' in tool_response:
+                        response_content = self._format_tool_response(tool_response['result'])
+                    else:
+                        response_content = self._format_tool_response(tool_response)
+                elif isinstance(tool_response, list):
+                    response_content = self._format_list_response(tool_response)
+                else:
+                    response_content = str(tool_response)
+                
+                # 如果没有有效内容，使用默认消息
+                if not response_content or response_content.strip() == "":
+                    tool_name = execution_result.get('tool_name', '工具')
+                    response_content = f"已使用 {tool_name} 完成查询，但没有返回具体数据。"
+        else:
+            # 失败情况
+            error_msg = final_result.get('error', '处理失败')
+            response_content = f"抱歉，处理您的请求时出现问题：{error_msg}"
+        
+        # 如果仍然没有内容，提供默认回答
+        if not response_content or response_content.strip() == "":
+            response_content = "查询已完成，但没有返回具体结果。"
+        
         return {
             "finalize_answer": {
                 "status": "completed",
                 "success": final_result.get('success', False),
+                "response": response_content,
+                "partial_content": response_content,  # 前端期望的字段
                 "timestamp": datetime.now().isoformat()
             }
         }
+    
+    def _format_tool_response(self, response_data: Any) -> str:
+        """
+        格式化工具响应为用户友好的文本
+        
+        Args:
+            response_data: 工具响应数据
+            
+        Returns:
+            格式化后的文本
+        """
+        if isinstance(response_data, dict):
+            # 如果是字典，尝试提取关键信息
+            formatted_lines = []
+            for key, value in response_data.items():
+                if value is not None and str(value).strip():
+                    formatted_lines.append(f"**{key}**: {value}")
+            
+            if formatted_lines:
+                return "\n".join(formatted_lines)
+            else:
+                return "数据查询完成，但结果为空。"
+        
+        elif isinstance(response_data, list):
+            return self._format_list_response(response_data)
+        
+        else:
+            return str(response_data) if response_data is not None else "无数据返回"
+    
+    def _format_list_response(self, response_list: List[Any]) -> str:
+        """
+        格式化列表响应为用户友好的文本
+        
+        Args:
+            response_list: 列表响应数据
+            
+        Returns:
+            格式化后的文本
+        """
+        if not response_list:
+            return "查询完成，但没有找到相关数据。"
+        
+        formatted_lines = []
+        for i, item in enumerate(response_list[:10], 1):  # 限制显示前10项
+            if isinstance(item, dict):
+                # 如果列表项是字典，提取关键信息
+                item_info = []
+                for key, value in item.items():
+                    if value is not None and str(value).strip():
+                        item_info.append(f"{key}: {value}")
+                
+                if item_info:
+                    formatted_lines.append(f"{i}. {', '.join(item_info)}")
+            else:
+                formatted_lines.append(f"{i}. {item}")
+        
+        result = "\n".join(formatted_lines)
+        
+        if len(response_list) > 10:
+            result += f"\n\n... 还有 {len(response_list) - 10} 项数据"
+        
+        return result
     
     def convert_single_turn_events(self, result: Dict[str, Any]) -> List[Dict[str, Any]]:
         """

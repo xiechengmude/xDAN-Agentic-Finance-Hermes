@@ -1,0 +1,112 @@
+[
+  {
+    "test_id": "1",
+    "question": "我想构建一个稳健的基金投资组合，请帮我分析易方达、华夏、南方基金公司旗下的优质混合型基金，并给出配置建议。",
+    "success": false,
+    "actual_tools": [],
+    "expected_tools": [
+      "fund_SearchFunds",
+      "fund_BatchGetFundsDetail",
+      "fund_GetBatchFundPerformance",
+      "fund_GetAssetAllocation"
+    ],
+    "actual_turns": 0,
+    "expected_turns_range": [
+      4,
+      5
+    ],
+    "execution_time": 4.7752251625061035,
+    "error": null,
+    "response": "无答案",
+    "tool_coverage": 0.0,
+    "trace_id": null
+  },
+  {
+    "test_id": "2",
+    "question": "今天龙虎榜上有哪些热门股票？请分析排名前5的股票的财务状况、资金流向和投资价值。",
+    "success": false,
+    "actual_tools": [],
+    "expected_tools": [
+      "blockTrade_block_trade",
+      "moneyflow_moneyflow",
+      "income_income",
+      "balancesheet_balancesheet"
+    ],
+    "actual_turns": 0,
+    "expected_turns_range": [
+      4,
+      6
+    ],
+    "execution_time": 7.622097015380859,
+    "error": null,
+    "response": "无答案",
+    "tool_coverage": 0.0,
+    "trace_id": null
+  },
+  {
+    "test_id": "3",
+    "question": "当前市场上哪些概念板块最活跃？请分析新能源、人工智能、生物医药板块的资金流向和投资机会。",
+    "success": false,
+    "actual_tools": [],
+    "expected_tools": [
+      "concept_concept",
+      "conceptDetail_concept_detail",
+      "moneyflowIndThs_moneyflow_ind_ths",
+      "moneyflowCntThs_moneyflow_cnt_ths"
+    ],
+    "actual_turns": 0,
+    "expected_turns_range": [
+      3,
+      4
+    ],
+    "execution_time": 4.838083744049072,
+    "error": null,
+    "response": "无答案",
+    "tool_coverage": 0.0,
+    "trace_id": null
+  },
+  {
+    "test_id": "4",
+    "question": "今天涨停的股票都有哪些共同题材？请分析这些题材的持续性和投资逻辑。",
+    "success": false,
+    "actual_tools": [],
+    "expected_tools": [
+      "stkFactor_stk_factor",
+      "conceptDetail_concept_detail",
+      "moneyflow_moneyflow",
+      "stkSurv_stk_surv"
+    ],
+    "actual_turns": 0,
+    "expected_turns_range": [
+      4,
+      5
+    ],
+    "execution_time": 4.597571849822998,
+    "error": null,
+    "response": "无答案",
+    "tool_coverage": 0.0,
+    "trace_id": null
+  },
+  {
+    "test_id": "5",
+    "question": "请分析张坤、刘彦春等知名基金经理的投资风格，并推荐他们管理的优质基金。",
+    "success": false,
+    "actual_tools": [],
+    "expected_tools": [
+      "fund_SearchFunds",
+      "fund_BatchGetFundsHolding",
+      "fund_BatchGetFundPerformance",
+      "fund_SearchManagerViewpoint"
+    ],
+    "actual_turns": 0,
+    "expected_turns_range": [
+      3,
+      4
+    ],
+    "execution_time": 4.746746301651001,
+    "error": null,
+    "response": "无答案",
+    "tool_coverage": 0.0,
+    "trace_id": null
+  }
+]

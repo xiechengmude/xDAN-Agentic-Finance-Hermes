@@ -15,6 +15,7 @@ from ..utils.mcp_client import MCPClientManager
 from .json_parser import JSONParser
 from .selector import IntelligentToolSelector
 from .parallel_executor import ParallelExecutor
+from ..utils.langfuse_integration import trace_async, log_generation, log_tool_call, langfuse_integration
 
 
 class MultiTurnToolSelector:
@@ -85,6 +86,7 @@ class MultiTurnToolSelector:
             print(f"✅ 多轮工具选择器初始化成功")
         return success
     
+    @trace_async(name="multi_turn_execution", metadata={"type": "multi_turn"})
     async def multi_turn_execution(self, complex_query: str) -> Dict[str, Any]:
         """
         多轮工具执行主函数
@@ -137,7 +139,7 @@ class MultiTurnToolSelector:
     
     async def _task_planning(self, complex_query: str) -> Dict[str, Any]:
         """
-        任务规划阶段
+        任务规划阶段 - 结合LLM智能判断和基础规则
         
         Args:
             complex_query: 复杂查询
@@ -147,7 +149,202 @@ class MultiTurnToolSelector:
         """
         print("📋 开始任务规划...")
         
-        prompt = self._generate_task_planning_prompt(complex_query)
+        # 1. 基础规则快速判断（仅针对明确的问候语和单词）
+        basic_greetings = {
+            "你好", "hello", "hi", "hey", "测试", "test", "谢谢", "thanks", "thank you",
+            "再见", "bye", "goodbye", "帮助", "help", "？", "?", "是", "yes", "no", "否"
+        }
+        
+        query_stripped = complex_query.strip().lower()
+        
+        # 完全匹配基础词汇 - 直接跳过
+        if query_stripped in basic_greetings or len(query_stripped) <= 2:
+            print(f"⚡ 基础规则匹配，直接跳过分解: '{complex_query}'")
+            return {
+                "is_complex": False,
+                "reason": "基础问候语或单词，无需分解",
+                "rule_matched": True
+            }
+        
+        # 2. LLM 智能判断
+        print("🤖 使用LLM进行智能复杂度判断...")
+        complexity_result = await self._llm_complexity_analysis(complex_query)
+        
+        if not complexity_result.get('is_complex', True):
+            print(f"🧠 LLM判断为简单查询: {complexity_result.get('reason', '无需分解')}")
+            return {
+                "is_complex": False,
+                "reason": complexity_result.get('reason', 'LLM判断为简单查询'),
+                "llm_analysis": complexity_result
+            }
+        
+        # 3. 如果判断为复杂查询，进行详细任务分解
+        print("🔧 LLM判断为复杂查询，开始详细任务分解...")
+        task_plan = await self._llm_task_decomposition(complex_query, complexity_result)
+        
+        if task_plan and task_plan.get('sub_tasks'):
+            print(f"✅ 任务规划完成，共分解为 {len(task_plan['sub_tasks'])} 个子任务")
+            return task_plan
+        else:
+            print("❌ 任务分解失败，回退到单轮模式")
+            return {
+                "is_complex": False,
+                "reason": "任务分解失败，回退到单轮模式"
+            }
+    
+    async def _llm_complexity_analysis(self, query: str) -> Dict[str, Any]:
+        """
+        使用LLM进行查询复杂度分析
+        
+        Args:
+            query: 用户查询
+            
+        Returns:
+            复杂度分析结果
+        """
+        prompt = f"""你是一个专业的查询复杂度分析专家。请分析用户查询是否需要多步骤处理。
+
+## 用户查询
+"{query}"
+
+## 分析标准
+**简单查询** (单步骤即可完成):
+- 问候语、礼貌用语
+- 单一数据查询（如"查询某股票价格"）
+- 基础信息查询（如"什么是股票"）
+- 简单的是非问题
+
+**复杂查询** (需要多步骤分解):
+- 投资分析类（需要多维度数据整合）
+- 比较分析类（需要查询多个标的）
+- 趋势分析类（需要历史数据+技术分析）
+- 策略建议类（需要综合多种因素）
+
+## 输出要求
+请以JSON格式返回分析结果：
+
+```json
+{{
+  "is_complex": true/false,
+  "confidence": 0.0-1.0,
+  "reason": "判断理由",
+  "query_type": "问候语|数据查询|投资分析|比较分析|趋势分析|策略建议|其他",
+  "estimated_steps": 1-5
+}}
+```
+
+请开始分析："""
+
+        try:
+            # 记录到Langfuse
+            messages = [
+                {
+                    "role": "system",
+                    "content": "你是一个专业的查询分析专家，擅长判断查询的复杂度。请严格按照JSON格式返回结果。"
+                },
+                {"role": "user", "content": prompt}
+            ]
+            
+            response = self.llm_client.chat.completions.create(
+                model=self.config['model_name'],
+                messages=messages,
+                temperature=0.1,
+                max_tokens=500
+            )
+            
+            response_text = response.choices[0].message.content.strip()
+            
+            # 记录LLM生成到Langfuse
+            if langfuse_integration.enabled:
+                log_generation(
+                    input_text=prompt,
+                    output_text=response_text,
+                    model_name=self.config['model_name'],
+                    metadata={
+                        "type": "complexity_analysis",
+                        "query": query
+                    }
+                )
+            print(f"🔍 LLM复杂度分析响应: {response_text[:200]}...")
+            
+            # 解析结果
+            result = self.json_parser.extract_json_from_response(response_text)
+            
+            if result and 'is_complex' in result:
+                return result
+            else:
+                print("❌ LLM复杂度分析解析失败，默认为简单查询")
+                return {
+                    "is_complex": False,
+                    "reason": "LLM分析解析失败，保守处理",
+                    "confidence": 0.5
+                }
+                
+        except Exception as e:
+            print(f"❌ LLM复杂度分析失败: {e}")
+            # 出错时默认为简单查询，避免不必要的复杂处理
+            return {
+                "is_complex": False,
+                "reason": f"LLM分析出错: {str(e)}",
+                "confidence": 0.0
+            }
+    
+    async def _llm_task_decomposition(self, complex_query: str, complexity_analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        使用LLM进行任务分解
+        
+        Args:
+            complex_query: 复杂查询
+            complexity_analysis: 复杂度分析结果
+            
+        Returns:
+            任务分解结果
+        """
+        # 获取可用工具信息
+        tools_summary = self._get_tools_summary()
+        query_type = complexity_analysis.get('query_type', '未知')
+        estimated_steps = complexity_analysis.get('estimated_steps', 2)
+        
+        prompt = f"""你是一个专业的任务分解专家。基于复杂度分析结果，将用户查询分解为具体的执行步骤。
+
+## 用户查询
+"{complex_query}"
+
+## 复杂度分析结果
+- 查询类型: {query_type}
+- 预估步骤数: {estimated_steps}
+- 判断理由: {complexity_analysis.get('reason', '')}
+
+## 可用工具类型
+{tools_summary}
+
+## 分解原则
+1. **逻辑顺序**: 确保步骤之间有清晰的逻辑关系
+2. **工具匹配**: 每个步骤都要有对应的工具支持
+3. **数据依赖**: 考虑步骤间的数据传递关系
+4. **结果整合**: 最终能形成完整的分析报告
+
+## 输出格式
+```json
+{{
+  "is_complex": true,
+  "complexity_reason": "分解原因",
+  "sub_tasks": [
+    {{
+      "step": 1,
+      "description": "步骤描述",
+      "query": "具体查询语句",
+      "expected_tool_type": "期望工具类型",
+      "dependency": null,
+      "priority": "high|medium|low"
+    }}
+  ],
+  "integration_strategy": "结果整合策略",
+  "expected_output": "期望输出格式"
+}}
+```
+
+请开始分解："""
         
         try:
             response = self.llm_client.chat.completions.create(
@@ -155,7 +352,7 @@ class MultiTurnToolSelector:
                 messages=[
                     {
                         "role": "system",
-                        "content": "你是一个专业的任务规划专家，擅长将复杂查询分解为可执行的子任务序列。"
+                        "content": "你是一个专业的任务分解专家，擅长将复杂查询分解为可执行的子任务序列。请严格按照JSON格式返回结果。"
                     },
                     {"role": "user", "content": prompt}
                 ],
@@ -164,19 +361,15 @@ class MultiTurnToolSelector:
             )
             
             response_text = response.choices[0].message.content.strip()
+            print(f"🔍 LLM任务分解响应: {response_text[:200]}...")
             
-            # 解析任务规划结果
+            # 解析任务分解结果
             task_plan = self.json_parser.extract_json_from_response(response_text)
             
-            if task_plan and 'sub_tasks' in task_plan:
-                print(f"✅ 任务规划完成，共分解为 {len(task_plan['sub_tasks'])} 个子任务")
-                return task_plan
-            else:
-                print("❌ 任务规划解析失败")
-                return {}
+            return task_plan if task_plan else {}
                 
         except Exception as e:
-            print(f"❌ 任务规划失败: {e}")
+            print(f"❌ LLM任务分解失败: {e}")
             return {}
     
     async def _execute_multi_turn_plan(self, task_plan: Dict[str, Any]) -> Dict[str, Any]:
@@ -393,62 +586,7 @@ class MultiTurnToolSelector:
         if len(self.conversation_context) > 10:
             self.conversation_context = self.conversation_context[-10:]
     
-    def _generate_task_planning_prompt(self, complex_query: str) -> str:
-        """生成任务规划提示词"""
-        
-        # 获取可用工具信息
-        tools_summary = self._get_tools_summary()
-        
-        prompt = f"""你是一个专业的任务规划专家。用户提出了一个复杂的查询，你需要分析是否需要分解为多个子任务，以及如何分解。
 
-## 用户查询
-{complex_query}
-
-## 可用工具类型
-{tools_summary}
-
-## 任务分解原则
-1. **复杂度判断**: 判断查询是否需要多个步骤才能完成
-2. **依赖关系**: 考虑子任务之间的依赖关系和执行顺序
-3. **工具匹配**: 确保每个子任务都有对应的工具可以执行
-4. **结果关联**: 考虑如何整合多个子任务的结果
-
-## 需要分解的查询类型示例
-- "分析XX股票的投资价值" (需要基本信息+财务数据+技术分析)
-- "比较XX和YY两只股票" (需要分别查询两只股票的信息)
-- "查询XX板块的龙头股并分析" (需要板块查询+个股分析)
-
-## 输出格式
-如果需要分解，请以JSON格式输出：
-
-```json
-{{
-  "is_complex": true,
-  "complexity_reason": "查询原因说明",
-  "sub_tasks": [
-    {{
-      "step": 1,
-      "description": "子任务描述",
-      "query": "具体的查询语句",
-      "expected_tool_type": "期望的工具类型",
-      "dependency": "依赖的前置任务(如无则为null)"
-    }}
-  ],
-  "integration_strategy": "如何整合各子任务结果的策略"
-}}
-```
-
-如果不需要分解，请输出：
-```json
-{{
-  "is_complex": false,
-  "reason": "不需要分解的原因"
-}}
-```
-
-请开始分析："""
-        
-        return prompt
     
     def _generate_integration_prompt(self, original_query: str, successful_results: List[Dict]) -> str:
         """生成结果整合提示词"""

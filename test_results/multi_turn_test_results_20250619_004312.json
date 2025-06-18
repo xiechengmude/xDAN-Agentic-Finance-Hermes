@@ -1,0 +1,28 @@
+[
+  {
+    "test_id": "1",
+    "question": "我想构建一个稳健的基金投资组合，请帮我分析易方达、华夏、南方基金公司旗下的优质混合型基金，并给出配置建议。",
+    "success": false,
+    "actual_tools": [
+      "tushareMcp_get_pro_bar",
+      "tushareMcp_get_daily",
+      "tushareMcp_get_fund_basic"
+    ],
+    "expected_tools": [
+      "fund_SearchFunds",
+      "fund_BatchGetFundsDetail",
+      "fund_GetBatchFundPerformance",
+      "fund_GetAssetAllocation"
+    ],
+    "actual_turns": 4,
+    "expected_turns_range": [
+      4,
+      5
+    ],
+    "execution_time": 114.44704985618591,
+    "error": null,
+    "response": "无答案",
+    "tool_coverage": 0.0,
+    "trace_id": null
+  }
+]

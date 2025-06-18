@@ -6,6 +6,7 @@ MCP Client Manager Module
 """
 
 import asyncio
+import time
 from typing import Dict, List, Any, Optional, Tuple
 
 try:
@@ -26,6 +27,7 @@ except ImportError as e:
             pass
 
 from .config import Config
+from .langfuse_integration import log_tool_call
 
 
 class MCPClientManager:
@@ -63,43 +65,71 @@ class MCPClientManager:
         Returns:
             是否加载成功
         """
-        try:
-            async with self.client:
-                tools_result = await self.client.list_tools()
+        # 重试机制
+        max_retries = 3
+        retry_delay = 2  # seconds
+        
+        for attempt in range(max_retries):
+            try:
+                print(f"🔄 尝试连接MCP服务器 (第 {attempt + 1}/{max_retries} 次)...")
                 
-                if hasattr(tools_result, 'tools'):
-                    self.tools = tools_result.tools
-                elif isinstance(tools_result, list):
-                    self.tools = tools_result
+                # 使用超时控制
+                async with asyncio.timeout(15):  # 15 second total timeout
+                    async with self.client:
+                        tools_result = await self.client.list_tools()
+                        
+                        if hasattr(tools_result, 'tools'):
+                            self.tools = tools_result.tools
+                        elif isinstance(tools_result, list):
+                            self.tools = tools_result
+                        else:
+                            print(f"⚠️ 意外的工具结果类型: {type(tools_result)}")
+                            if attempt < max_retries - 1:
+                                await asyncio.sleep(retry_delay)
+                                continue
+                            return False
+                        
+                        # 构建详细的工具schema映射
+                        for tool in self.tools:
+                            schema_info = {
+                                'name': tool.name,
+                                'description': tool.description,
+                                'parameters': {}
+                            }
+                            
+                            if hasattr(tool, 'inputSchema') and tool.inputSchema:
+                                schema = tool.inputSchema
+                                if isinstance(schema, dict) and 'properties' in schema:
+                                    for param_name, param_info in schema['properties'].items():
+                                        schema_info['parameters'][param_name] = {
+                                            'type': param_info.get('type', 'string'),
+                                            'description': param_info.get('description', ''),
+                                            'required': param_name in schema.get('required', [])
+                                        }
+                            
+                            self.tool_schemas[tool.name] = schema_info
+                        
+                        self._tools_loaded = True
+                        print(f"✅ 成功连接到MCP服务器并加载 {len(self.tools)} 个工具")
+                        return True
+                        
+            except asyncio.TimeoutError:
+                print(f"⏱️ 连接超时 (尝试 {attempt + 1}/{max_retries})")
+                if attempt < max_retries - 1:
+                    print(f"⏳ 等待 {retry_delay} 秒后重试...")
+                    await asyncio.sleep(retry_delay)
                 else:
-                    return False
-                
-                # 构建详细的工具schema映射
-                for tool in self.tools:
-                    schema_info = {
-                        'name': tool.name,
-                        'description': tool.description,
-                        'parameters': {}
-                    }
+                    print("❌ 连接MCP服务器超时，已达最大重试次数")
                     
-                    if hasattr(tool, 'inputSchema') and tool.inputSchema:
-                        schema = tool.inputSchema
-                        if isinstance(schema, dict) and 'properties' in schema:
-                            for param_name, param_info in schema['properties'].items():
-                                schema_info['parameters'][param_name] = {
-                                    'type': param_info.get('type', 'string'),
-                                    'description': param_info.get('description', ''),
-                                    'required': param_name in schema.get('required', [])
-                                }
+            except Exception as e:
+                print(f"❌ 连接失败 (尝试 {attempt + 1}/{max_retries}): {type(e).__name__}: {e}")
+                if attempt < max_retries - 1:
+                    print(f"⏳ 等待 {retry_delay} 秒后重试...")
+                    await asyncio.sleep(retry_delay)
+                else:
+                    print(f"❌ 加载工具失败: {e}")
                     
-                    self.tool_schemas[tool.name] = schema_info
-                
-                self._tools_loaded = True
-                return True
-                
-        except Exception as e:
-            print(f"❌ 加载工具失败: {e}")
-            return False
+        return False
     
     async def call_tool(self, tool_name: str, parameters: Dict[str, Any]) -> Tuple[bool, Any, str]:
         """
@@ -121,11 +151,34 @@ class MCPClientManager:
         if validated_params is None:
             return False, None, "参数验证失败"
         
+        start_time = time.time()
         try:
             async with self.client:
                 response = await self.client.call_tool(tool_name, validated_params)
+                duration = time.time() - start_time
+                
+                # 记录工具调用到Langfuse
+                log_tool_call(
+                    tool_name=tool_name,
+                    parameters=validated_params,
+                    result=response,
+                    success=True,
+                    duration=duration
+                )
+                
                 return True, response, "调用成功"
         except Exception as e:
+            duration = time.time() - start_time
+            
+            # 记录失败的工具调用
+            log_tool_call(
+                tool_name=tool_name,
+                parameters=validated_params,
+                result=None,
+                success=False,
+                duration=duration
+            )
+            
             return False, None, str(e)
     
     def _validate_parameters(self, tool_name: str, parameters: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -139,19 +192,30 @@ class MCPClientManager:
         Returns:
             验证后的参数字典，验证失败返回None
         """
+        if not tool_name or tool_name not in self.tool_schemas:
+            print(f"❌ 工具 {tool_name} 不存在")
+            return None
+        
         tool_schema = self.tool_schemas[tool_name]
         validated_params = {}
         
+        # 安全检查：确保 parameters 不为 None
+        if parameters is None:
+            parameters = {}
+        
         # 检查必需参数
-        for param_name, param_info in tool_schema['parameters'].items():
-            if param_info['required'] and param_name not in parameters:
+        tool_parameters = tool_schema.get('parameters', {})
+        for param_name, param_info in tool_parameters.items():
+            if param_info.get('required', False) and param_name not in parameters:
                 print(f"❌ 缺少必需参数: {param_name}")
                 return None
         
         # 过滤有效参数
         for param_name, param_value in parameters.items():
-            if param_name in tool_schema['parameters']:
-                validated_params[param_name] = param_value
+            if param_name in tool_parameters:
+                # 确保参数值不为 None（如果工具不接受 None 值）
+                if param_value is not None:
+                    validated_params[param_name] = param_value
             else:
                 print(f"⚠️ 忽略无效参数: {param_name}")
         

@@ -6,8 +6,17 @@ XDANLangGraphAdapter for converting xDAN backend to LangGraph-compatible API
 import asyncio
 import json
 import uuid
+import os
 from typing import Dict, Any, List, Optional, AsyncGenerator
 from datetime import datetime
+
+# 加载环境变量
+from pathlib import Path
+import sys
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(project_root / "tests"))
+from load_env import load_dotenv
+load_dotenv()
 
 from intelligent_tool_selector import MultiTurnToolSelector
 from .event_mapper import EventMapper
@@ -35,7 +44,12 @@ class XDANLangGraphAdapter:
                 self.is_initialized = True
                 print("✅ XDANLangGraphAdapter 初始化成功")
             else:
-                print("❌ XDANLangGraphAdapter 初始化失败")
+                # 尝试在无MCP工具的情况下运行
+                print("⚠️ MCP工具加载失败，尝试启用降级模式...")
+                self.is_initialized = True  # 允许在没有MCP的情况下运行
+                self.xdan_selector._initialized = True  # 设置选择器为已初始化
+                print("✅ XDANLangGraphAdapter 已在降级模式下初始化（无MCP工具）")
+                return True  # 返回成功，允许服务启动
             return success
         return True
     
@@ -103,10 +117,31 @@ class XDANLangGraphAdapter:
             await asyncio.sleep(0.2)
             
             # 执行xDAN多轮工具调用
-            result = await self.xdan_selector.multi_turn_execution(query)
+            try:
+                result = await self.xdan_selector.multi_turn_execution(query)
+            except Exception as e:
+                # 降级模式：返回简单的文本响应
+                print(f"⚠️ 多轮执行失败，使用降级响应: {e}")
+                result = {
+                    'type': 'degraded',
+                    'success': True,
+                    'final_result': {
+                        'answer': f"抱歉，由于MCP工具服务暂时不可用，我无法执行具体的数据查询。您的问题是: {query}\n\n请稍后再试，或联系系统管理员。",
+                        'sources': []
+                    }
+                }
             
             # 根据执行类型转换事件
-            if result.get('type') == 'multi_turn':
+            if result.get('type') == 'degraded':
+                print("⚠️ 处理降级模式结果...")
+                # 发送降级模式的最终答案
+                yield {
+                    "finalize_answer": {
+                        "answer": result['final_result']['answer'],
+                        "sources": []
+                    }
+                }
+            elif result.get('type') == 'multi_turn':
                 print("🔄 处理多轮执行结果...")
                 async for event in self._process_multi_turn_result(result):
                     yield event
@@ -259,7 +294,10 @@ class XDANLangGraphAdapter:
     def get_available_tools_count(self) -> int:
         """获取可用工具数量"""
         if self.is_initialized:
-            return self.xdan_selector.single_turn_selector.get_tools_count()
+            try:
+                return self.xdan_selector.single_turn_selector.get_tools_count()
+            except:
+                return 0  # 降级模式下返回0
         return 0
     
     async def health_check(self) -> Dict[str, Any]:
