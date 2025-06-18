@@ -34,10 +34,10 @@ check_python_version() {
         local major=$(echo $version | cut -d. -f1)
         local minor=$(echo $version | cut -d. -f2)
         
-        if [ "$major" -ge 3 ] && [ "$minor" -ge 8 ]; then
-            echo -e "${GREEN}✅ Python3${NC}: $version (满足要求 ≥3.8)"
+        if [ "$major" -ge 3 ] && [ "$minor" -ge 10 ]; then
+            echo -e "${GREEN}✅ Python3${NC}: $version (满足要求 ≥3.10)"
         else
-            echo -e "${YELLOW}⚠️  Python3${NC}: $version (建议升级到 3.8+)"
+            echo -e "${YELLOW}⚠️  Python3${NC}: $version (建议升级到 3.10+)"
         fi
     else
         echo -e "${RED}❌ Python3${NC}: 未安装"
@@ -63,7 +63,8 @@ check_node_version() {
 # 主检查流程
 echo "🐍 Python 环境检查:"
 check_python_version
-check_command "pip3" "pip3" "21.0"
+check_command "uv" "uv (推荐)" "0.1"
+check_command "pip3" "pip3 (备用)" "21.0"
 
 echo ""
 echo "📦 Node.js 环境检查:"
@@ -142,10 +143,18 @@ echo "🎯 修复建议:"
 echo "========================="
 
 if ! command -v python3 &> /dev/null; then
-    echo "📋 安装 Python 3.8+:"
-    echo "# macOS: brew install python@3.11"
-    echo "# Ubuntu: sudo apt install python3.11"
-    echo "# Windows: https://www.python.org/downloads/"
+    echo "📋 安装 Python 3.10+:"
+    echo "# macOS: brew install python@3.11 uv"
+    echo "# Ubuntu: sudo apt install python3.11 && curl -LsSf https://astral.sh/uv/install.sh | sh"
+    echo "# Windows: https://www.python.org/downloads/ && pip install uv"
+    echo ""
+fi
+
+if ! command -v uv &> /dev/null; then
+    echo "📋 安装 uv 包管理器 (推荐):"
+    echo "# macOS: brew install uv"
+    echo "# Ubuntu: curl -LsSf https://astral.sh/uv/install.sh | sh"
+    echo "# Windows: pip install uv"
     echo ""
 fi
 
@@ -159,7 +168,11 @@ fi
 
 if ! python3 -c "import fastapi" &> /dev/null; then
     echo "📋 安装 Python 依赖:"
-    echo "pip3 install fastapi uvicorn pydantic"
+    if command -v uv &> /dev/null; then
+        echo "uv pip install fastapi uvicorn pydantic  # 推荐 (极速安装)"
+    else
+        echo "pip3 install fastapi uvicorn pydantic   # 传统方式"
+    fi
     echo ""
 fi
 

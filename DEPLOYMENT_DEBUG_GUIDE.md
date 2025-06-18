@@ -14,7 +14,7 @@
 ```bash
 # 方式1: 使用 Homebrew (推荐)
 brew install python@3.11
-brew install pip
+brew install uv  # 现代Python包管理器
 
 # 方式2: 使用 pyenv (版本管理)
 brew install pyenv
@@ -22,8 +22,8 @@ pyenv install 3.11.0
 pyenv global 3.11.0
 
 # 验证安装
-python3 --version  # 应显示 3.11.x
-pip3 --version
+python3 --version  # 应显示 3.11.x (需要 ≥3.10)
+uv --version
 ```
 
 **Windows:**
@@ -35,9 +35,14 @@ pip3 --version
 # 方式2: 使用 Chocolatey
 choco install python311
 
+# 安装 uv 包管理器
+pip install uv
+# 或使用 PowerShell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
 # 验证安装
-python --version
-pip --version
+python --version  # 需要 ≥3.10
+uv --version
 ```
 
 **Linux (Ubuntu/Debian):**
@@ -51,9 +56,13 @@ sudo apt install python3.11 python3.11-pip python3.11-venv
 # 设置默认版本
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
 
+# 安装 uv 包管理器
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.cargo/env
+
 # 验证安装
-python3 --version
-pip3 --version
+python3 --version  # 需要 ≥3.10
+uv --version
 ```
 
 #### 📦 Node.js 环境安装
@@ -155,15 +164,15 @@ curl --version
 
 ### 2. 项目依赖安装
 
-#### 🔧 后端依赖安装
+#### 🔧 后端依赖安装 (使用 uv)
 
 ```bash
 # 1. 克隆项目
 git clone https://github.com/xiechengmude/xDAN-Agentic-Finance-Hermes.git
 cd xDAN-Agentic-Search-Test
 
-# 2. 创建虚拟环境 (推荐)
-python3 -m venv .venv
+# 2. 使用 uv 创建虚拟环境 (推荐)
+uv venv .venv
 
 # 激活虚拟环境
 # macOS/Linux:
@@ -171,17 +180,19 @@ source .venv/bin/activate
 # Windows:
 .venv\Scripts\activate
 
-# 3. 升级 pip
-pip install --upgrade pip
+# 3. 使用 uv 安装核心依赖 (极速安装)
+uv pip install fastapi uvicorn pydantic
 
-# 4. 安装核心依赖
-pip install fastapi uvicorn pydantic
+# 4. 安装完整依赖 (如果有 requirements.txt)
+uv pip install -r requirements.txt
 
-# 5. 安装完整依赖 (如果有 requirements.txt)
-pip install -r requirements.txt
-
-# 6. 验证安装
+# 5. 验证安装
 python -c "import fastapi, uvicorn; print('✅ 后端依赖安装成功')"
+
+# 传统方式 (如果不使用 uv)
+# python3 -m venv .venv
+# source .venv/bin/activate
+# pip install fastapi uvicorn pydantic
 ```
 
 #### 🎨 前端依赖安装
@@ -206,14 +217,38 @@ npm run --silent build > /dev/null && echo "✅ 前端依赖安装成功"
 
 | 组件 | 最低版本 | 推荐版本 | 验证命令 |
 |------|----------|----------|----------|
-| **Python** | 3.8+ | 3.11 | `python3 --version` |
-| **pip** | 21.0+ | 最新 | `pip3 --version` |
+| **Python** | 3.10+ | 3.11 | `python3 --version` |
+| **uv** | 0.1+ | 最新 | `uv --version` |
 | **Node.js** | 16.0+ | 18.17+ | `node --version` |
 | **npm** | 8.0+ | 9.0+ | `npm --version` |
 | **Git** | 2.20+ | 最新 | `git --version` |
 | **curl** | 7.68+ | 最新 | `curl --version` |
 
-### 4. 环境检查脚本
+### 4. uv 包管理器优势
+
+**为什么选择 uv？**
+
+| 特性 | uv | pip | 优势 |
+|------|----|----|------|
+| **安装速度** | ⚡ 10-100x 更快 | 🐌 标准速度 | Rust实现，并行下载 |
+| **依赖解析** | 🧠 智能解析 | 🔄 递归解析 | 更准确的依赖管理 |
+| **虚拟环境** | 🚀 `uv venv` | 📦 `python -m venv` | 更快的环境创建 |
+| **缓存管理** | 💾 全局缓存 | 📁 用户缓存 | 节省磁盘空间 |
+| **兼容性** | ✅ 100% pip兼容 | ✅ 原生 | 无缝替换 |
+
+**性能对比示例：**
+```bash
+# 传统方式 (pip)
+time pip install fastapi uvicorn pydantic
+# 大约 15-30 秒
+
+# uv 方式
+time uv pip install fastapi uvicorn pydantic  
+# 大约 2-5 秒 (首次安装)
+# 大约 0.5-1 秒 (缓存命中)
+```
+
+### 5. 环境检查脚本
 
 创建一个快速检查脚本来验证所有环境是否正确安装：
 
@@ -242,8 +277,8 @@ check_command() {
 
 # 检查 Python
 echo "🐍 Python 环境检查:"
-check_command "python3" "Python3" "3.8"
-check_command "pip3" "pip3" "21.0"
+check_command "python3" "Python3" "3.10"
+check_command "uv" "uv" "0.1"
 
 # 检查 Node.js
 echo ""
@@ -322,19 +357,18 @@ chmod +x check_environment.sh
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # 2. 安装基础环境
-brew install python@3.11 node@18 git curl
+brew install python@3.11 node@18 git curl uv
 
 # 3. 克隆项目
 git clone https://github.com/xiechengmude/xDAN-Agentic-Finance-Hermes.git
 cd xDAN-Agentic-Search-Test
 
-# 4. 创建并激活虚拟环境
-python3 -m venv .venv
+# 4. 使用 uv 创建并激活虚拟环境
+uv venv .venv
 source .venv/bin/activate
 
-# 5. 安装 Python 依赖
-pip install --upgrade pip
-pip install fastapi uvicorn pydantic
+# 5. 使用 uv 安装 Python 依赖 (极速安装)
+uv pip install fastapi uvicorn pydantic
 
 # 6. 环境检查
 ./check_environment.sh
@@ -356,18 +390,18 @@ iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocola
 
 # 2. 安装基础环境
 choco install python311 nodejs git curl
+pip install uv
 
 # 3. 克隆项目
 git clone https://github.com/xiechengmude/xDAN-Agentic-Finance-Hermes.git
 cd xDAN-Agentic-Search-Test
 
-# 4. 创建虚拟环境
-python -m venv .venv
+# 4. 使用 uv 创建虚拟环境
+uv venv .venv
 .venv\Scripts\activate
 
-# 5. 安装依赖
-pip install --upgrade pip
-pip install fastapi uvicorn pydantic
+# 5. 使用 uv 安装依赖 (极速安装)
+uv pip install fastapi uvicorn pydantic
 
 # 6. 启动服务
 python simple_api.py
@@ -381,18 +415,19 @@ sudo apt update && sudo apt upgrade -y
 # 2. 安装基础环境
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y python3.11 python3.11-pip python3.11-venv nodejs git curl build-essential
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.cargo/env
 
 # 3. 克隆项目
 git clone https://github.com/xiechengmude/xDAN-Agentic-Finance-Hermes.git
 cd xDAN-Agentic-Search-Test
 
-# 4. 设置 Python 环境
-python3.11 -m venv .venv
+# 4. 使用 uv 设置 Python 环境
+uv venv .venv
 source .venv/bin/activate
 
-# 5. 安装依赖
-pip install --upgrade pip
-pip install fastapi uvicorn pydantic
+# 5. 使用 uv 安装依赖 (极速安装)
+uv pip install fastapi uvicorn pydantic
 
 # 6. 启动服务
 ./start_fullstack.sh simple
@@ -734,7 +769,7 @@ PyCharm:
 
 ### 启动前检查
 
-- [ ] Python 3.8+ 已安装
+- [ ] Python 3.10+ 已安装
 - [ ] Node.js 16+ 已安装 (如需前端)
 - [ ] 端口 8000, 8001, 8003, 5173 未被占用
 - [ ] 项目依赖已安装 (`pip install -r requirements.txt`)
