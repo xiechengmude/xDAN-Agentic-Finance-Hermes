@@ -21,7 +21,7 @@ export default function App() {
     max_research_loops: number;
     reasoning_model: string;
   }>({
-    apiUrl: "http://localhost:5173",
+    apiUrl: "http://localhost:8003",
     assistantId: "xdan-agent",
     messagesKey: "messages",
     onFinish: (event: any) => {
