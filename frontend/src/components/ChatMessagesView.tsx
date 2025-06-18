@@ -134,6 +134,60 @@ const mdComponents = {
   ),
 };
 
+// Think Content Renderer Component
+interface ThinkContentRendererProps {
+  content: string;
+  mdComponents: typeof mdComponents;
+}
+
+const ThinkContentRenderer: React.FC<ThinkContentRendererProps> = ({
+  content,
+  mdComponents,
+}) => {
+  // 检查是否包含think标签
+  const hasThinkTags =
+    content.includes("<think>") && content.includes("</think>");
+
+  if (hasThinkTags) {
+    // 解析think内容
+    const thinkMatch = content.match(/<think>(.*?)<\/think>/s);
+    const afterThinkMatch = content.match(/<\/think>\s*(.*)/s);
+
+    const thinkContent = thinkMatch ? thinkMatch[1].trim() : "";
+    const finalAnswer = afterThinkMatch ? afterThinkMatch[1].trim() : "";
+
+    return (
+      <div className="space-y-3">
+        {/* Think过程部分 */}
+        {thinkContent && (
+          <details className="bg-neutral-800 border border-neutral-600 rounded-lg p-3">
+            <summary className="cursor-pointer text-sm font-medium text-neutral-300 hover:text-white mb-2">
+              🤔 思考过程 (点击展开/收起)
+            </summary>
+            <div className="mt-3 pt-3 border-t border-neutral-700 text-sm text-neutral-400">
+              <ReactMarkdown components={mdComponents}>
+                {thinkContent}
+              </ReactMarkdown>
+            </div>
+          </details>
+        )}
+
+        {/* 最终答案部分 */}
+        {finalAnswer && (
+          <div className="text-white">
+            <ReactMarkdown components={mdComponents}>
+              {finalAnswer}
+            </ReactMarkdown>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 如果不包含think标签，直接渲染内容
+  return <ReactMarkdown components={mdComponents}>{content}</ReactMarkdown>;
+};
+
 // Props for HumanMessageBubble
 interface HumanMessageBubbleProps {
   message: Message;
@@ -196,12 +250,15 @@ const AiMessageBubble: React.FC<AiMessageBubbleProps> = ({
           />
         </div>
       )}
-      <ReactMarkdown components={mdComponents}>
-        {typeof message.content === "string"
-          ? message.content
-          : JSON.stringify(message.content)}
-      </ReactMarkdown>
-      <Button
+      <ThinkContentRenderer
+        content={
+          typeof message.content === "string"
+            ? message.content
+            : JSON.stringify(message.content)
+        }
+        mdComponents={mdComponents}
+      />
+      {/* <Button
         variant="default"
         className="cursor-pointer bg-neutral-700 border-neutral-600 text-neutral-300 self-end"
         onClick={() =>
@@ -215,7 +272,7 @@ const AiMessageBubble: React.FC<AiMessageBubbleProps> = ({
       >
         {copiedMessageId === message.id ? "Copied" : "Copy"}
         {copiedMessageId === message.id ? <CopyCheck /> : <Copy />}
-      </Button>
+      </Button> */}
     </div>
   );
 };

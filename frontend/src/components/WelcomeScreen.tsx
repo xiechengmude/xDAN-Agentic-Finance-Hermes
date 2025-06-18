@@ -12,6 +12,8 @@ interface WelcomeScreenProps {
   isLoading: boolean;
 }
 
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
+
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   handleSubmit,
   onCancel,
@@ -28,7 +30,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     setHealthStatus("");
 
     try {
-      const response = await fetch("http://localhost:8000/health", {
+      const response = await fetch(`${BACKEND_API_URL}/health`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
